@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -22,7 +24,7 @@ namespace LifeLight
             InitializeComponent();
 
             Items = new List<TodoItem>();
-            Items.Add(new TodoItem() { Title = "Morning Benzodiazepine", TimeVisibility = Visibility.Visible, Comment = "POOT" });
+            Items.Add(new TodoItem() { Title = "Morning Benzodiazepine", TimeVisibility = Visibility.Visible });
             Items.Add(new TodoItem() { Title = "AM Vitamins" });
             Items.Add(new TodoItem() { Title = "Breakfast", TimeVisibility = Visibility.Visible });
             Items.Add(new TodoItem() { Title = "AM Brush Teeth / Mouthwash" });
@@ -35,19 +37,17 @@ namespace LifeLight
             Items.Add(new TodoItem() { Title = "Night Benzodiazepine", TimeVisibility = Visibility.Visible });
             Items.Add(new TodoItem() { Title = "PM Brush Teeth / Mouthwash" });
             
-            TodoList.ItemsSource = Items;
+            lbTodoList.ItemsSource = Items;
         }
 
         private void btnSetNow_Click(object sender, RoutedEventArgs e)
         {
-            Items[TodoList.SelectedIndex].Time = DateTime.Now;
-            MessageBox.Show(Items[TodoList.SelectedIndex].Time.ToString()); 
+            Items[lbTodoList.SelectedIndex].Time = DateTime.Now;
         }
 
         private void btnEdit_Click(object sender, RoutedEventArgs e)
         {
-            foreach (object o in TodoList.SelectedItems)
-                MessageBox.Show((o as TodoItem).Title);
+            //Do stuff
         }
 
         private void calDate_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
@@ -57,12 +57,47 @@ namespace LifeLight
 
     }
 
-    public class TodoItem
+}
+
+public class TodoItem : INotifyPropertyChanged
+{
+    private string _title = "";
+    private bool _complete;
+    private DateTime _time;
+    private string _comment = "";
+    private Visibility _timeVisibility = Visibility.Hidden;
+
+    public required string Title
     {
-        public string Title { get; set; }
-        public bool Complete { get; set; }
-        public DateTime Time { get; set; }
-        public string Comment { get; set; }
-        public Visibility TimeVisibility { get; set; } = Visibility.Hidden;
+        get => _title;
+        set { _title = value; OnPropertyChanged(); }
+    }
+    public bool Complete
+    {
+        get => _complete;
+        set { _complete = value; OnPropertyChanged(); }
+    }
+    public DateTime Time
+    {
+        get => _time;
+        set { _time = value; OnPropertyChanged(); }
+    }
+    public string Comment
+    {
+        get => _comment;
+        set { _comment = value; OnPropertyChanged(); }
+    }
+    public Visibility TimeVisibility
+    {
+        get => _timeVisibility;
+        set { _timeVisibility = value; OnPropertyChanged(); }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }
+
+

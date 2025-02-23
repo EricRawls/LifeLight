@@ -38,7 +38,7 @@
             <TextBlock Text="TODO: Add mood rating trackbar" />
             <TextBlock Text="TODO: Add daily comments textbox" />
         </StackPanel>
-        <ListBox Name="TodoList" HorizontalContentAlignment="Stretch" SelectionMode="Extended" AlternationCount="2"><!--SelectionChanged="lbTodoList_SelectionChanged">-->
+        <ListBox Name="lbTodoList" HorizontalContentAlignment="Stretch" SelectionMode="Extended" AlternationCount="2"><!--SelectionChanged="lbTodoList_SelectionChanged">-->
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid Margin="0,2">
@@ -52,8 +52,8 @@
                             <TextBlock Text="{Binding Title}" />
                         </CheckBox>
                         <Button Grid.Column="1" Visibility="{Binding TimeVisibility}" Width="60" Name="btnSetNow" Click="btnSetNow_Click">Set Now</Button>
-                        <TextBox Grid.Column="2" Visibility="{Binding TimeVisibility}" Name="tpSetTime" Text="{Binding Time}" />
-                        <TextBox Grid.Column="3" Text="{Binding Comment}" Margin="20,0,0,0" />
+                        <TextBox Name="tbTime"  Grid.Column="2" Visibility="{Binding TimeVisibility}" Text="{Binding Time, StringFormat='hh:mm tt'}" />
+                        <TextBox Name="tbComment" Grid.Column="3" Text="{Binding Comment}" Margin="20,0,0,0" />
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
