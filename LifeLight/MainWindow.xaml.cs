@@ -22,6 +22,9 @@ namespace LifeLight
         {
             InitializeComponent();
 
+            //DateTime today = DateTime.Today;
+            //calDate.BlackoutDates.Add(new CalendarDateRange(today.AddDays(1), today.AddYears(1)));
+
             Items = new ObservableCollection<TodoItem>
                 {
                 new TodoItem() { Title = "Morning Benzodiazepine", TimeVisibility = Visibility.Visible },
@@ -41,7 +44,15 @@ namespace LifeLight
             lvTodoList.ItemsSource = Items;
         }
 
-         private void tbTime_LostFocus(object sender, RoutedEventArgs e)
+        private void TextBox_GotKeyboardFocus(object sender, RoutedEventArgs e)
+        {
+            if (sender is TextBox textBox)
+            {
+                textBox.Dispatcher.BeginInvoke(new Action(() => textBox.SelectAll()), System.Windows.Threading.DispatcherPriority.Input);
+            }
+        }
+
+        private void tbTime_LostFocus(object sender, RoutedEventArgs e)
         {
             if (sender is TextBox tb && tb.DataContext is TodoItem item)
             {
@@ -145,7 +156,7 @@ namespace LifeLight
             {
                 var selectedItem = Items[lvTodoList.SelectedIndex];
                 selectedItem.Time = DateTime.Now;
-                MessageBox.Show($"Time set to: {selectedItem.Time.ToString("hh:mm tt")}");
+                //MessageBox.Show($"Time set to: {selectedItem.Time.ToString("hh:mm tt")}");
             }
         }
 
@@ -153,7 +164,7 @@ namespace LifeLight
         {
             if (calDate.SelectedDate.HasValue)
             {
-                MessageBox.Show($"Selected Date: {calDate.SelectedDate.Value.ToString("d")}");
+                //MessageBox.Show($"Selected Date: {calDate.SelectedDate.Value.ToString("d")}");
             }
         }
 
@@ -162,6 +173,23 @@ namespace LifeLight
             MessageBox.Show("Export clicked!");
         }
     }
+    public class InverseBooleanConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value is bool boolean)
+                return !boolean;
+            return value;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value is bool boolean)
+                return !boolean;
+            return value;
+        }
+    }
+
 }
 
 public class TodoItem : INotifyPropertyChanged

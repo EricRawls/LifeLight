@@ -6,6 +6,10 @@
         xmlns:local="clr-namespace:LifeLight"
         mc:Ignorable="d"
         Title="LifeLight" Height="600" Width="1200">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <local:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+    </Window.Resources>
     <DockPanel Margin="10">
         <StackPanel DockPanel.Dock="Right" Margin="10,0">
             <StackPanel.Resources>
@@ -13,7 +17,11 @@
                     <Setter Property="Margin" Value="0,0,0,5" />
                 </Style>
             </StackPanel.Resources>
-            <Calendar Name="calDate" SelectedDatesChanged="calDate_SelectedDateChanged" />
+            <Calendar Name="calDate"
+                      SelectedDatesChanged="calDate_SelectedDateChanged" 
+                      DisplayDateStart="2025-01-01" 
+                      DisplayDateEnd="{x:Static sys:DateTime.Today}" 
+                      xmlns:sys="clr-namespace:System;assembly=mscorlib" />
             <Button Name="btnExport" Click="btnExport_Click">Export</Button>
             <TextBlock Text="TODO: Add mood rating trackbar" />
             <TextBlock Text="TODO: Add daily comments textbox" />
@@ -41,6 +49,9 @@
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Focusable" Value="True"/>
                         </Trigger>
+                        <DataTrigger Binding="{Binding Complete}" Value="True">
+                            <Setter Property="Background" Value="#E6FFE6"/>
+                        </DataTrigger>
                     </Style.Triggers>
                 </Style>
             </ListView.ItemContainerStyle>
@@ -60,17 +71,44 @@
                             <ColumnDefinition Width="60"/>
                             <ColumnDefinition Width="120*"/>
                         </Grid.ColumnDefinitions>
-                        <CheckBox Name="cbComplete" IsChecked="{Binding Complete, UpdateSourceTrigger=PropertyChanged}" Focusable="True" IsHitTestVisible="True" IsTabStop="True"
-                                  Click="cbComplete_Click" >
+                        <CheckBox Name="cbComplete" 
+                  IsChecked="{Binding Complete, UpdateSourceTrigger=PropertyChanged}" 
+                  Focusable="True" 
+                  IsHitTestVisible="True" 
+                  IsTabStop="True"
+                  Click="cbComplete_Click">
                             <TextBlock Text="{Binding Title}"/>
                         </CheckBox>
-                        <Button Name="btnSetNow" Grid.Column="1" Visibility="{Binding TimeVisibility}" Width="60" Click="btnSetNow_Click"
-                                Focusable="True" IsHitTestVisible="True" IsTabStop="True">Set Now</Button>
-                        <TextBox Name="tbTime" Grid.Column="2" Visibility="{Binding TimeVisibility}" Text="{Binding Time, StringFormat='hh:mm tt'}" 
-                                 Focusable="True" IsReadOnly="False" IsHitTestVisible="True" IsTabStop="True"
-                                 LostFocus="tbTime_LostFocus"/>
-                        <TextBox Name="tbComment" Grid.Column="3" Text="{Binding Comment, UpdateSourceTrigger=PropertyChanged}" Margin="20,0,0,0" 
-                                 Focusable="True" IsReadOnly="False" IsHitTestVisible="True" IsTabStop="True"/>
+                        <Button Name="btnSetNow" 
+                                Grid.Column="1" 
+                                Visibility="{Binding TimeVisibility}" 
+                                Width="60" 
+                                Click="btnSetNow_Click"
+                                Focusable="True" 
+                                IsHitTestVisible="True" 
+                                IsTabStop="True"
+                                IsEnabled="{Binding Complete, Converter={StaticResource InverseBooleanConverter}}">Set Now</Button>
+                        <TextBox Name="tbTime" 
+                                 Grid.Column="2" 
+                                 Visibility="{Binding TimeVisibility}" 
+                                 Text="{Binding Time, StringFormat='hh:mm tt'}" 
+                                 Focusable="True" 
+                                 IsReadOnly="False" 
+                                 IsHitTestVisible="True" 
+                                 IsTabStop="True"
+                                 LostFocus="tbTime_LostFocus"
+                                 IsEnabled="{Binding Complete, Converter={StaticResource InverseBooleanConverter}}"
+                                 GotFocus="TextBox_GotKeyboardFocus"/>
+                        <TextBox Name="tbComment" 
+                                 Grid.Column="3" 
+                                 Text="{Binding Comment, UpdateSourceTrigger=PropertyChanged}" 
+                                 Margin="20,0,0,0" 
+                                 Focusable="True" 
+                                 IsReadOnly="False" 
+                                 IsHitTestVisible="True" 
+                                 IsTabStop="True"
+                                 IsEnabled="{Binding Complete, Converter={StaticResource InverseBooleanConverter}}"
+                                 GotFocus="TextBox_GotKeyboardFocus"/>
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
