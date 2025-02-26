@@ -41,70 +41,30 @@ namespace LifeLight
             lvTodoList.ItemsSource = Items;
         }
 
-        private void CheckBox_GotFocus(object sender, RoutedEventArgs e)
+         private void tbTime_LostFocus(object sender, RoutedEventArgs e)
         {
-            //MessageBox.Show("CheckBox focused!");
-        }
-
-        private void CheckBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            //MessageBox.Show("CheckBox lost focus!");
-            if (sender is CheckBox cb)
+            if (sender is TextBox tb && tb.DataContext is TodoItem item)
             {
-                //
+                if (DateTime.TryParse(tb.Text, out DateTime time))
+                {
+                    item.Time = time;
+                    // Optionally format for display (but keep raw for editing)
+                    tb.Text = time.ToString("hh:mm tt");
+                }
+                else
+                {
+                    MessageBox.Show("Please enter a valid time (e.g., 01:30 PM).", "Invalid Time", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    tb.Text = item.Time.ToString("hh:mm tt"); // Revert to last valid value
+                }
             }
         }
 
-        private void TextBox_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            //MessageBox.Show("TextBox clicked!");
-            if (sender is TextBox tb)
-            {
-                tb.Focus(); // Ensure focus stays on TextBox
-            }
-        }
-
-        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
-        {
-           // MessageBox.Show("TextBox focused!");
-        }
-
-        private void TextBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            //MessageBox.Show("TextBox lost focus!");
-            if (sender is TextBox tb)
-            {
-                //
-            }
-        }
-
-
-        private void CheckBox_MouseDown(object sender, MouseButtonEventArgs e)
+        private void cbComplete_Click(object sender, RoutedEventArgs e)
         {
             //MessageBox.Show("CheckBox clicked!");
             if (sender is CheckBox cb && cb.DataContext is TodoItem item)
             {
-                item.Complete = !item.Complete; // Ensure toggle works
-            }
-        }
-
- 
-
-
-
-
-
-        private void tbTime_TextChanged(object sender, EventArgs e)
-        {
-            if (sender is TextBox tb)
-            {
-                if (DateTime.TryParse(tb.Text, out DateTime time))
-                {
-                    var item = (TodoItem)tb.DataContext;
-                    item.Time = time;
-                    MessageBox.Show(item.Time.ToLongDateString());
-                    item.TimeEntered = true;
-                }
+                item.Complete = cb.IsChecked ?? false; // Update Complete based on IsChecked
             }
         }
 
@@ -152,12 +112,8 @@ namespace LifeLight
         }
 
 
-        /// <summary>
-        /// TODO: Implement drag-and-drop functionality for reordering items in the list.
-        /// THIS MUST BE DONE ON A CHILD WINDOW OR SIMILAR RENDERING OF THE LIST WITHOUT CHECKBOX OR TEXTBOX CONTROLS.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        // TODO: Implement this drag-and-drop functionality for reordering items in the list.
+        // THIS MUST BE DONE ON A CHILD WINDOW OR SIMILAR RENDERING OF THE LIST WITHOUT CHECKBOX OR TEXTBOX CONTROLS.
         private void TodoList_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (e.OriginalSource is FrameworkElement element && element.DataContext is TodoItem draggedItem)
@@ -190,15 +146,6 @@ namespace LifeLight
                 var selectedItem = Items[lvTodoList.SelectedIndex];
                 selectedItem.Time = DateTime.Now;
                 MessageBox.Show($"Time set to: {selectedItem.Time.ToString("hh:mm tt")}");
-            }
-        }
-
-        private void tbTime_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (sender is TextBox tb && tb.DataContext is TodoItem item)
-            {
-                // Optional: Parse or validate time input if needed
-                // For now, rely on binding to update Time via INotifyPropertyChanged
             }
         }
 
@@ -263,5 +210,3 @@ public class TodoItem : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }
-
-

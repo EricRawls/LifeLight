@@ -57,179 +57,23 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="240"/>
                             <ColumnDefinition Width="100"/>
-                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="60"/>
                             <ColumnDefinition Width="120*"/>
                         </Grid.ColumnDefinitions>
-                        <CheckBox IsChecked="{Binding Complete, UpdateSourceTrigger=PropertyChanged}" Focusable="True" IsHitTestVisible="True" IsTabStop="True"
-                                  MouseDown="CheckBox_MouseDown" GotFocus="CheckBox_GotFocus" LostFocus="CheckBox_LostFocus">
+                        <CheckBox Name="cbComplete" IsChecked="{Binding Complete, UpdateSourceTrigger=PropertyChanged}" Focusable="True" IsHitTestVisible="True" IsTabStop="True"
+                                  Click="cbComplete_Click" >
                             <TextBlock Text="{Binding Title}"/>
                         </CheckBox>
-                        <Button Grid.Column="1" Visibility="{Binding TimeVisibility}" Width="60" Name="btnSetNow" Click="btnSetNow_Click"
+                        <Button Name="btnSetNow" Grid.Column="1" Visibility="{Binding TimeVisibility}" Width="60" Click="btnSetNow_Click"
                                 Focusable="True" IsHitTestVisible="True" IsTabStop="True">Set Now</Button>
-                        <TextBox Name="tbTime" Grid.Column="2" Visibility="{Binding TimeVisibility}" Text="{Binding Time, StringFormat='hh:mm tt', UpdateSourceTrigger=PropertyChanged}" 
+                        <TextBox Name="tbTime" Grid.Column="2" Visibility="{Binding TimeVisibility}" Text="{Binding Time, StringFormat='hh:mm tt'}" 
                                  Focusable="True" IsReadOnly="False" IsHitTestVisible="True" IsTabStop="True"
-                                 MouseDown="TextBox_MouseDown" GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus"
-                                 TextChanged="tbTime_TextChanged"/>
+                                 LostFocus="tbTime_LostFocus"/>
                         <TextBox Name="tbComment" Grid.Column="3" Text="{Binding Comment, UpdateSourceTrigger=PropertyChanged}" Margin="20,0,0,0" 
-                                 Focusable="True" IsReadOnly="False" IsHitTestVisible="True" IsTabStop="True"
-                                 MouseDown="TextBox_MouseDown" GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus"/>
+                                 Focusable="True" IsReadOnly="False" IsHitTestVisible="True" IsTabStop="True"/>
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
     </DockPanel>
 </Window>
-
-
-
-<!--<Window x:Class="LifeLight.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:LifeLight"
-        mc:Ignorable="d"
-        Title="LifeLight" Height="600" Width="1200">
-    <DockPanel Margin="10">
-        <StackPanel DockPanel.Dock="Right" Margin="10,0">
-            <StackPanel.Resources>
-                <Style TargetType="Button">
-                    <Setter Property="Margin" Value="0,0,0,5" />
-                </Style>
-            </StackPanel.Resources>
-            <Calendar Name="calDate" SelectedDatesChanged="calDate_SelectedDateChanged" />
-            <Button Name="btnExport" Click="btnExport_Click">Export</Button>
-            <TextBlock Text="TODO: Add mood rating trackbar" />
-            <TextBlock Text="TODO: Add daily comments textbox" />
-        </StackPanel>
-        <ListView Name="lvTodoList" AllowDrop="True"
-                  PreviewMouseLeftButtonDown="TodoList_PreviewMouseLeftButtonDown"
-                  Drop="TodoList_Drop"
-                  HorizontalContentAlignment="Stretch" SelectionMode="Extended" AlternationCount="2"
-                  Focusable="True"
-                  IsHitTestVisible="True"
-                  KeyboardNavigation.TabNavigation="Local"
-                  KeyboardNavigation.DirectionalNavigation="Cycle">
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="AllowDrop" Value="True"/>
-                    <Setter Property="Focusable" Value="True"/>
-                    <Setter Property="IsHitTestVisible" Value="True"/>
-                    <Setter Property="KeyboardNavigation.TabNavigation" Value="Local"/>
-                    <Setter Property="KeyboardNavigation.IsTabStop" Value="True"/>
-                    <Style.Triggers>
-                        <Trigger Property="ItemsControl.AlternationIndex" Value="1">
-                            <Setter Property="Background" Value="#F5F5F5"/>
-                        </Trigger>
-                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                            <Setter Property="IsSelected" Value="True"/>
-                        </Trigger>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Focusable" Value="True"/>
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </ListView.ItemContainerStyle>
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <Grid Margin="0,2" IsHitTestVisible="True" Focusable="True">
-                        <Grid.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem Header="Add Item Above" Click="AddAbove_Click"/>
-                                <MenuItem Header="Add Item Below" Click="AddBelow_Click"/>
-                                <MenuItem Header="Delete Item" Click="DeleteItem_Click"/>
-                            </ContextMenu>
-                        </Grid.ContextMenu>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="240"/>
-                            <ColumnDefinition Width="100"/>
-                            <ColumnDefinition Width="80"/>
-                            <ColumnDefinition Width="120*"/>
-                        </Grid.ColumnDefinitions>
-                        <CheckBox IsChecked="{Binding Complete, UpdateSourceTrigger=PropertyChanged}" Focusable="True" IsHitTestVisible="True" IsTabStop="True"
-                                  MouseDown="CheckBox_MouseDown" GotFocus="CheckBox_GotFocus" LostFocus="CheckBox_LostFocus">
-                            <TextBlock Text="{Binding Title}"/>
-                        </CheckBox>
-                        <Button Grid.Column="1" Visibility="{Binding TimeVisibility}" Width="60" Name="btnSetNow" Click="btnSetNow_Click"
-                                Focusable="True" IsHitTestVisible="True" IsTabStop="True">Set Now</Button>
-                        <TextBox Name="tbTime" Grid.Column="2" Visibility="{Binding TimeVisibility}" Text="{Binding Time, StringFormat='hh:mm tt', UpdateSourceTrigger=PropertyChanged}" 
-                                 Focusable="True" IsReadOnly="False" IsHitTestVisible="True" IsTabStop="True"
-                                 MouseDown="TextBox_MouseDown" GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus"
-                                 TextChanged="tbTime_TextChanged"/>
-                        <TextBox Name="tbComment" Grid.Column="3" Text="{Binding Comment, UpdateSourceTrigger=PropertyChanged}" Margin="20,0,0,0" 
-                                 Focusable="True" IsReadOnly="False" IsHitTestVisible="True" IsTabStop="True"
-                                 MouseDown="TextBox_MouseDown" GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus"/>
-                    </Grid>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
-    </DockPanel>
-</Window>-->
-    
-    
-    <!--<Window x:Class="LifeLight.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:LifeLight"
-        mc:Ignorable="d"
-        Title="LifeLight" Height="600" Width="1200">
-    <DockPanel Margin="10">
-        <StackPanel DockPanel.Dock="Right" Margin="10,0">
-            <StackPanel.Resources>
-                <Style TargetType="Button">
-                    <Setter Property="Margin" Value="0,0,0,5" />
-                </Style>
-            </StackPanel.Resources>
-            <Calendar Name="calDate" SelectedDatesChanged="calDate_SelectedDateChanged" />
-            <Button Name="btnExport" Click="btnExport_Click">Export</Button>
-            <TextBlock Text="TODO: Add mood rating trackbar" />
-            <TextBlock Text="TODO: Add daily comments textbox" />
-        </StackPanel>
-        <ListView Name="lvTodoList" AllowDrop="True"
-                 PreviewMouseLeftButtonDown="TodoList_PreviewMouseLeftButtonDown"
-                 Drop="TodoList_Drop"
-                 HorizontalContentAlignment="Stretch" SelectionMode="Extended" AlternationCount="2">
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="AllowDrop" Value="True"/>
-                    <Style.Triggers>
-                        <Trigger Property="ItemsControl.AlternationIndex" Value="1">
-                            <Setter Property="Background" Value="#F5F5F5"></Setter>
-                        </Trigger>
-                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                            <Setter Property="IsSelected" Value="True" />
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </ListView.ItemContainerStyle>
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <Grid Margin="0,2">
-                        <Grid.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem Header="Add Item Above" Click="AddAbove_Click"/>
-                                <MenuItem Header="Add Item Below" Click="AddBelow_Click"/>
-                                <MenuItem Header="Delete Item" Click="DeleteItem_Click"/>
-                            </ContextMenu>
-                        </Grid.ContextMenu>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="240" />
-                            <ColumnDefinition Width="100" />
-                            <ColumnDefinition Width="80" />
-                            <ColumnDefinition Width="120*" />
-                        </Grid.ColumnDefinitions>
-                        <CheckBox IsChecked="{Binding Complete}">
-                            <TextBlock Text="{Binding Title}" />
-                        </CheckBox>
-                        <Button Grid.Column="1" Visibility="{Binding TimeVisibility}" Width="60" Name="btnSetNow" Click="btnSetNow_Click">Set Now</Button>
-                        <TextBox Name="tbTime"  Grid.Column="2" Visibility="{Binding TimeVisibility}" Text="{Binding Time, StringFormat='hh:mm tt'}"
-                                TextChanged="tbTime_TextChanged" />
-                        <TextBox Name="tbComment" Grid.Column="3" Text="{Binding Comment}" Margin="20,0,0,0" />
-                    </Grid>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
-    </DockPanel>
-</Window>-->
