@@ -32,7 +32,7 @@
         </Style>
     </Window.Resources>
     <DockPanel Margin="10">
-        <StackPanel DockPanel.Dock="Right" Margin="10,0">
+        <StackPanel DockPanel.Dock="Right" Margin="10,0" >
             <StackPanel.Resources>
                 <Style TargetType="Button">
                     <Setter Property="Margin" Value="0,0,0,5" />
@@ -43,9 +43,15 @@
                       DisplayDateStart="2025-01-01" 
                       DisplayDateEnd="{x:Static sys:DateTime.Today}" 
                       xmlns:sys="clr-namespace:System;assembly=mscorlib" />
-            <Button Name="btnExport" Click="btnExport_Click">Export</Button>
-            <TextBlock Text="TODO: Add mood rating trackbar" />
-            <TextBlock Text="TODO: Add daily comments textbox" />
+            <Button Name="btnExport" Width="180" Click="btnExport_Click">Export CSV</Button>
+            <TextBlock TextWrapping="Wrap" Width="180" Text="TODO: Add Edit context menu item to change an entry" />
+            <TextBlock/>
+            <TextBlock TextWrapping="Wrap" Width="180" Text="TODO: Add mood rating trackbar" />
+            <TextBlock/>
+            <TextBlock TextWrapping="Wrap" Width="180" Text="TODO: Add daily comments textbox" />
+            <TextBlock/>
+            <TextBlock TextWrapping="Wrap" Width="180" Text="TODO: Add Reports button to show reports window with checkboxes for each item to report,
+                       start date calendar, end date calendar, report button on that window." />
         </StackPanel>
         <ListView Name="lvTodoList"
                   HorizontalContentAlignment="Stretch" SelectionMode="Extended" AlternationCount="2"
@@ -84,6 +90,8 @@
                                 <MenuItem Header="Add Item Above" Click="AddAbove_Click"/>
                                 <MenuItem Header="Add Item Below" Click="AddBelow_Click"/>
                                 <MenuItem Header="Delete Item" Click="DeleteItem_Click"/>
+                                <Separator/>
+                                <MenuItem Header="Sort List" Click="SortList_Click"/>
                             </ContextMenu>
                         </Grid.ContextMenu>
                         <Grid.ColumnDefinitions>

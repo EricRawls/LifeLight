@@ -135,7 +135,24 @@ namespace LifeLight
         {
             if (lvTodoList.SelectedItem is TodoItem selectedItem)
             {
-                Items.Remove(selectedItem);
+                var dialog = new ConfirmDialog(this, "Are you sure you want to delete this item?", "Confirm Deletion");
+                if (dialog.ShowDialog() == true) // ShowDialog centers it over the owner window
+                {
+                    Items.Remove(selectedItem);
+                }
+            }
+        }
+
+        private void SortList_Click(object sender, RoutedEventArgs e)
+        {
+            var sortWindow = new SortTodoItemsWindow(new ObservableCollection<TodoItem>(Items)) { Owner = this };
+            if (sortWindow.ShowDialog() == true)
+            {
+                Items.Clear();
+                foreach (var item in sortWindow.SortedItems)
+                {
+                    Items.Add(item);
+                }
             }
         }
 
@@ -144,35 +161,12 @@ namespace LifeLight
             var addWindow = new AddTodoItemWindow { Owner = this };
             if (addWindow.ShowDialog() == true)
             {
-                Items.Insert(insertIndex >= 0 ? insertIndex : Items.Count, new TodoItem { Title = addWindow.NewTitle! });
-            }
-        }
-
-
-        // TODO: Implement this drag-and-drop functionality for reordering items in the list.
-        // THIS MUST BE DONE ON A CHILD WINDOW OR SIMILAR RENDERING OF THE LIST WITHOUT CHECKBOX OR TEXTBOX CONTROLS.
-        private void TodoList_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.OriginalSource is FrameworkElement element && element.DataContext is TodoItem draggedItem)
-            {
-                if (element is not (CheckBox or TextBox) && e.LeftButton == MouseButtonState.Pressed)
-                {
-                    DragDrop.DoDragDrop(lvTodoList, draggedItem, DragDropEffects.Move);
-                }
-            }
-        }
-        private void TodoList_Drop(object sender, DragEventArgs e)
-        {
-            if (e.Data.GetData(typeof(TodoItem)) is TodoItem droppedItem)
-            {
-                var target = ((FrameworkElement)e.OriginalSource).DataContext as TodoItem;
-                int oldIndex = Items.IndexOf(droppedItem);
-                int newIndex = target != null ? Items.IndexOf(target) : Items.Count - 1;
-
-                if (oldIndex != newIndex)
-                {
-                    Items.Move(oldIndex, newIndex);
-                }
+                Items.Insert(insertIndex >= 0 ? insertIndex : Items.Count,
+                    new TodoItem
+                    {
+                        Title = addWindow.NewTitle!,
+                        TimeVisibility = addWindow.NewTimeVisibility
+                    });
             }
         }
 
@@ -223,7 +217,6 @@ public class TodoItem : INotifyPropertyChanged
     private string _title = "";
     private bool _complete;
     private DateTime _time;
-    private bool _timeEntered;
     private string _comment = "";
     private Visibility _timeVisibility = Visibility.Hidden;
 
@@ -241,11 +234,6 @@ public class TodoItem : INotifyPropertyChanged
     {
         get => _time;
         set { _time = value; OnPropertyChanged(); }
-    }
-    public bool TimeEntered
-    {
-        get => _timeEntered;
-        set { _timeEntered = value; OnPropertyChanged(); }
     }
     public string Comment
     {

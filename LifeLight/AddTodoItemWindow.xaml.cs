@@ -1,15 +1,17 @@
 ﻿using System.Windows;
 using System.Windows.Input;
 
-namespace LifeLight // Match your project’s namespace
+namespace LifeLight
 {
     public partial class AddTodoItemWindow : Window
     {
         public string? NewTitle { get; private set; }
+        public Visibility NewTimeVisibility { get; private set; }
 
         public AddTodoItemWindow()
         {
             InitializeComponent();
+            NewTimeVisibility = Visibility.Hidden; // Default value
         }
 
         private void OK_Click(object sender, RoutedEventArgs e)
@@ -17,7 +19,8 @@ namespace LifeLight // Match your project’s namespace
             if (!string.IsNullOrWhiteSpace(txtTitle.Text))
             {
                 NewTitle = txtTitle.Text;
-                DialogResult = true; // Signals OK was clicked
+                NewTimeVisibility = cbShowTime.IsChecked == true ? Visibility.Visible : Visibility.Hidden;
+                DialogResult = true;
                 Close();
             }
             else
@@ -28,7 +31,7 @@ namespace LifeLight // Match your project’s namespace
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
-            DialogResult = false; // Signals cancellation
+            DialogResult = false;
             Close();
         }
 
