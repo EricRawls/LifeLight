@@ -45,6 +45,12 @@ namespace LifeLight
             lvTodoList.ItemsSource = Items;
         }
 
+        private void btnAppTODO_Click(object sender, RoutedEventArgs e)
+        {
+            var atdWindow = new AppTODOWindow { Owner = this };
+            atdWindow.Show();
+        }
+
         private void ExecuteRedo(object sender, ExecutedRoutedEventArgs e)
         {
             if (sender is TextBox textBox && textBox.CanRedo)

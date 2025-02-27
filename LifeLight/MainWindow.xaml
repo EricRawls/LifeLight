@@ -43,15 +43,8 @@
                       DisplayDateStart="2025-01-01" 
                       DisplayDateEnd="{x:Static sys:DateTime.Today}" 
                       xmlns:sys="clr-namespace:System;assembly=mscorlib" />
+            <Button Name="btnAppTODO" Width="180" Click="btnAppTODO_Click">App TODO</Button>
             <Button Name="btnExport" Width="180" Click="btnExport_Click">Export CSV</Button>
-            <TextBlock TextWrapping="Wrap" Width="180" Text="TODO: Add Edit context menu item to change an entry" />
-            <TextBlock/>
-            <TextBlock TextWrapping="Wrap" Width="180" Text="TODO: Add mood rating trackbar" />
-            <TextBlock/>
-            <TextBlock TextWrapping="Wrap" Width="180" Text="TODO: Add daily comments textbox" />
-            <TextBlock/>
-            <TextBlock TextWrapping="Wrap" Width="180" Text="TODO: Add Reports button to show reports window with checkboxes for each item to report,
-                       start date calendar, end date calendar, report button on that window." />
         </StackPanel>
         <ListView Name="lvTodoList"
                   HorizontalContentAlignment="Stretch" SelectionMode="Extended" AlternationCount="2"
