@@ -21,6 +21,7 @@ namespace LifeLight
         public MainWindow()
         {
             InitializeComponent();
+            CommandBindings.Add(new CommandBinding(ApplicationCommands.Redo, ExecuteRedo));
 
             //DateTime today = DateTime.Today;
             //calDate.BlackoutDates.Add(new CalendarDateRange(today.AddDays(1), today.AddYears(1)));
@@ -44,6 +45,14 @@ namespace LifeLight
             lvTodoList.ItemsSource = Items;
         }
 
+        private void ExecuteRedo(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (sender is TextBox textBox && textBox.CanRedo)
+            {
+                textBox.Redo();
+            }
+        }
+
         private void TextBox_GotKeyboardFocus(object sender, RoutedEventArgs e)
         {
             if (sender is TextBox textBox)
@@ -52,21 +61,38 @@ namespace LifeLight
             }
         }
 
+        private void tbTime_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                if (sender is TextBox tb && tb.DataContext is TodoItem item)
+                {
+                    tbTime_Validate(tb, item);
+                    e.Handled = true; // Prevent further processing (e.g., newline)
+                }
+            }
+        }
+
         private void tbTime_LostFocus(object sender, RoutedEventArgs e)
         {
             if (sender is TextBox tb && tb.DataContext is TodoItem item)
             {
-                if (DateTime.TryParse(tb.Text, out DateTime time))
-                {
-                    item.Time = time;
-                    // Optionally format for display (but keep raw for editing)
-                    tb.Text = time.ToString("hh:mm tt");
-                }
-                else
-                {
-                    MessageBox.Show("Please enter a valid time (e.g., 01:30 PM).", "Invalid Time", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    tb.Text = item.Time.ToString("hh:mm tt"); // Revert to last valid value
-                }
+                tbTime_Validate(tb, item);
+            }
+        }
+
+        private void tbTime_Validate(TextBox tb, TodoItem item)
+        {
+            if (DateTime.TryParse(tb.Text, out DateTime time))
+            {
+                item.Time = time;
+                // Optionally format for display (but keep raw for editing)
+                tb.Text = time.ToString("hh:mm tt");
+            }
+            else
+            {
+                MessageBox.Show("Please enter a valid time (e.g., 01:30 PM).", "Invalid Time", MessageBoxButton.OK, MessageBoxImage.Warning);
+                tb.Text = item.Time.ToString("hh:mm tt"); // Revert to last valid value
             }
         }
 

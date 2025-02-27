@@ -9,6 +9,27 @@
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <local:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+        <Style x:Key="TextBoxBaseStyle" TargetType="TextBox">
+            <Setter Property="Focusable" Value="True"/>
+            <Setter Property="IsReadOnly" Value="False"/>
+            <Setter Property="IsHitTestVisible" Value="True"/>
+            <Setter Property="IsTabStop" Value="True"/>
+            <Setter Property="IsEnabled" Value="{Binding Complete, Converter={StaticResource InverseBooleanConverter}}"/>
+            <Setter Property="ContextMenu">
+                <Setter.Value>
+                    <ContextMenu>
+                        <MenuItem Command="ApplicationCommands.Undo" Header="Undo"/>
+                        <MenuItem Command="ApplicationCommands.Redo" Header="Redo"/>
+                        <Separator/>
+                        <MenuItem Command="ApplicationCommands.Cut" Header="Cut"/>
+                        <MenuItem Command="ApplicationCommands.Copy" Header="Copy"/>
+                        <MenuItem Command="ApplicationCommands.Paste" Header="Paste"/>
+                        <Separator/>
+                        <MenuItem Command="ApplicationCommands.SelectAll" Header="Select All"/>
+                    </ContextMenu>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
     <DockPanel Margin="10">
         <StackPanel DockPanel.Dock="Right" Margin="10,0">
@@ -38,7 +59,7 @@
                     <Setter Property="Focusable" Value="True"/>
                     <Setter Property="IsHitTestVisible" Value="True"/>
                     <Setter Property="KeyboardNavigation.TabNavigation" Value="Local"/>
-                    <Setter Property="KeyboardNavigation.IsTabStop" Value="True"/>
+                    <Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
                     <Style.Triggers>
                         <Trigger Property="ItemsControl.AlternationIndex" Value="1">
                             <Setter Property="Background" Value="#F5F5F5"/>
@@ -57,7 +78,7 @@
             </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Grid Margin="0,2" IsHitTestVisible="True" Focusable="True">
+                    <Grid Margin="0,2" IsHitTestVisible="True" Focusable="True" KeyboardNavigation.IsTabStop="False">
                         <Grid.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="Add Item Above" Click="AddAbove_Click"/>
@@ -72,11 +93,11 @@
                             <ColumnDefinition Width="120*"/>
                         </Grid.ColumnDefinitions>
                         <CheckBox Name="cbComplete" 
-                  IsChecked="{Binding Complete, UpdateSourceTrigger=PropertyChanged}" 
-                  Focusable="True" 
-                  IsHitTestVisible="True" 
-                  IsTabStop="True"
-                  Click="cbComplete_Click">
+                                  IsChecked="{Binding Complete, UpdateSourceTrigger=PropertyChanged}" 
+                                  Focusable="True" 
+                                  IsHitTestVisible="True" 
+                                  IsTabStop="True"
+                                  Click="cbComplete_Click">
                             <TextBlock Text="{Binding Title}"/>
                         </CheckBox>
                         <Button Name="btnSetNow" 
@@ -90,25 +111,26 @@
                                 IsEnabled="{Binding Complete, Converter={StaticResource InverseBooleanConverter}}">Set Now</Button>
                         <TextBox Name="tbTime" 
                                  Grid.Column="2" 
+                                 Style="{StaticResource TextBoxBaseStyle}"
                                  Visibility="{Binding TimeVisibility}" 
                                  Text="{Binding Time, StringFormat='hh:mm tt'}" 
-                                 Focusable="True" 
-                                 IsReadOnly="False" 
-                                 IsHitTestVisible="True" 
-                                 IsTabStop="True"
-                                 LostFocus="tbTime_LostFocus"
-                                 IsEnabled="{Binding Complete, Converter={StaticResource InverseBooleanConverter}}"
-                                 GotFocus="TextBox_GotKeyboardFocus"/>
+                                 GotFocus="TextBox_GotKeyboardFocus"
+                                 KeyDown="tbTime_KeyDown"
+                                 LostFocus="tbTime_LostFocus">
+                            <TextBox.InputBindings>
+                                <KeyBinding Command="ApplicationCommands.Redo" Gesture="Ctrl+Shift+Z"/>
+                            </TextBox.InputBindings>
+                        </TextBox>
                         <TextBox Name="tbComment" 
                                  Grid.Column="3" 
+                                 Style="{StaticResource TextBoxBaseStyle}"
                                  Text="{Binding Comment, UpdateSourceTrigger=PropertyChanged}" 
                                  Margin="20,0,0,0" 
-                                 Focusable="True" 
-                                 IsReadOnly="False" 
-                                 IsHitTestVisible="True" 
-                                 IsTabStop="True"
-                                 IsEnabled="{Binding Complete, Converter={StaticResource InverseBooleanConverter}}"
-                                 GotFocus="TextBox_GotKeyboardFocus"/>
+                                 GotFocus="TextBox_GotKeyboardFocus">
+                            <TextBox.InputBindings>
+                                <KeyBinding Command="ApplicationCommands.Redo" Gesture="Ctrl+Shift+Z"/>
+                            </TextBox.InputBindings>
+                        </TextBox>
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
