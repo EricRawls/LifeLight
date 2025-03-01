@@ -14,7 +14,6 @@
             <Setter Property="IsReadOnly" Value="False"/>
             <Setter Property="IsHitTestVisible" Value="True"/>
             <Setter Property="IsTabStop" Value="True"/>
-            <Setter Property="IsEnabled" Value="{Binding Complete, Converter={StaticResource InverseBooleanConverter}}"/>
             <Setter Property="ContextMenu">
                 <Setter.Value>
                     <ContextMenu>
@@ -42,9 +41,22 @@
                       SelectedDatesChanged="calDate_SelectedDateChanged" 
                       DisplayDateStart="2025-01-01" 
                       DisplayDateEnd="{x:Static sys:DateTime.Today}" 
+                      Margin="10,13,10,10"
                       xmlns:sys="clr-namespace:System;assembly=mscorlib" />
-            <Button Name="btnAppTODO" Width="180" Click="btnAppTODO_Click">App TODO</Button>
-            <Button Name="btnExport" Width="180" Click="btnExport_Click">Export CSV</Button>
+            <TextBlock Margin="10,10,0,0">Daily Rating</TextBlock>
+            <Slider x:Name="sliderRating" Maximum="10" Minimum="0" Value="5" 
+                    Width="180" 
+                    Margin="10,0,10,10"
+                    IsSnapToTickEnabled="True"/>
+            <TextBlock Margin="10,10,0,0">Daily Notes</TextBlock>
+            <TextBox x:Name="tbDailyNotes" Width="180" Height="100"
+                     AcceptsReturn="True"
+                     TextWrapping="Wrap" 
+                     Style="{StaticResource TextBoxBaseStyle}"
+                     Margin="10,0,10,10"
+                     Text="{Binding DailyNotes}"/>
+            <Button Name="btnAppTODO" Margin="10,20,10,10" Width="180" Click="btnAppTODO_Click" VerticalAlignment="Bottom">App TODO</Button>
+            <Button Name="btnExport" Margin="10,0,10,10" Width="180" Click="btnExport_Click" VerticalAlignment="Bottom">Export CSV</Button>
         </StackPanel>
         <StackPanel DockPanel.Dock="Left">
             <TextBlock>Daily Needs</TextBlock>
@@ -97,7 +109,7 @@
                                 <ColumnDefinition Width="60"/>
                                 <ColumnDefinition Width="120*"/>
                             </Grid.ColumnDefinitions>
-                            <CheckBox Name="cbComplete" 
+                            <CheckBox x:Name="cbComplete" 
                                   IsChecked="{Binding Complete, UpdateSourceTrigger=PropertyChanged}" 
                                   Focusable="True" 
                                   IsHitTestVisible="True" 
@@ -105,7 +117,7 @@
                                   Click="cbComplete_Click">
                                 <TextBlock Text="{Binding Title}"/>
                             </CheckBox>
-                            <Button Name="btnSetNow" 
+                            <Button x:Name="btnSetNow" 
                                 Grid.Column="1" 
                                 Visibility="{Binding TimeVisibility}" 
                                 Width="60" 
@@ -114,9 +126,10 @@
                                 IsHitTestVisible="True" 
                                 IsTabStop="True"
                                 IsEnabled="{Binding Complete, Converter={StaticResource InverseBooleanConverter}}">Set Now</Button>
-                            <TextBox Name="tbTime" 
+                            <TextBox x:Name="tbTime" 
                                  Grid.Column="2" 
                                  Style="{StaticResource TextBoxBaseStyle}"
+                                 IsEnabled="{Binding Complete, Converter={StaticResource InverseBooleanConverter}}"
                                  Visibility="{Binding TimeVisibility}" 
                                  Text="{Binding Time, StringFormat='hh:mm tt'}" 
                                  GotFocus="TextBox_GotKeyboardFocus"
@@ -126,8 +139,9 @@
                                     <KeyBinding Command="ApplicationCommands.Redo" Gesture="Ctrl+Shift+Z"/>
                                 </TextBox.InputBindings>
                             </TextBox>
-                            <TextBox Name="tbComment" 
+                            <TextBox x:Name="tbComment" 
                                  Grid.Column="3" 
+                                 IsEnabled="{Binding Complete, Converter={StaticResource InverseBooleanConverter}}"
                                  Style="{StaticResource TextBoxBaseStyle}"
                                  Text="{Binding Comment, UpdateSourceTrigger=PropertyChanged}" 
                                  Margin="20,0,0,0" 
@@ -140,8 +154,7 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-            <TextBlock></TextBlock> <!--spacer-->
-            <TextBlock>Variable Frequency Items</TextBlock>
+            <TextBlock Margin="0,10,0,0">Variable Items</TextBlock>
             <ListView x:Name="lvVariableNeeds"
                   HorizontalContentAlignment="Stretch" SelectionMode="Extended" AlternationCount="2"
                   Focusable="True"
@@ -176,21 +189,21 @@
                         <Grid Margin="0,2" IsHitTestVisible="True" Focusable="True" KeyboardNavigation.IsTabStop="False">
                             <Grid.ContextMenu>
                                 <ContextMenu x:Name="cmVariableNeeds">
-                                    <MenuItem Header="Add Item Above" Click="AddAboveDaily_Click"/>
+                                    <!--<MenuItem Header="Add Item Above" Click="AddAboveDaily_Click"/>
                                     <MenuItem Header="Add Item Below" Click="AddBelowDaily_Click"/>
                                     <Separator/>
                                     <MenuItem Header="Delete Item" Click="DeleteDailyItem_Click"/>
                                     <Separator/>
-                                    <MenuItem Header="Sort List" Click="SortDailyItems_Click"/>
+                                    <MenuItem Header="Sort List" Click="SortDailyItems_Click"/>-->
                                 </ContextMenu>
                             </Grid.ContextMenu>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="240"/>
                                 <ColumnDefinition Width="100"/>
-                                <ColumnDefinition Width="60"/>
+                                <ColumnDefinition Width="260"/>
                                 <ColumnDefinition Width="120*"/>
                             </Grid.ColumnDefinitions>
-                            <CheckBox Name="cbComplete" 
+                            <CheckBox x:Name="cbComplete" 
                                   IsChecked="{Binding Complete, UpdateSourceTrigger=PropertyChanged}" 
                                   Focusable="True" 
                                   IsHitTestVisible="True" 
@@ -198,32 +211,23 @@
                                   Click="cbComplete_Click">
                                 <TextBlock Text="{Binding Title}"/>
                             </CheckBox>
-                            <Button Name="btnSetNow" 
-                                Grid.Column="1" 
-                                Visibility="{Binding TimeVisibility}" 
-                                Width="60" 
-                                Click="btnSetNow_Click"
-                                Focusable="True" 
-                                IsHitTestVisible="True" 
-                                IsTabStop="True"
-                                IsEnabled="{Binding Complete, Converter={StaticResource InverseBooleanConverter}}">Set Now</Button>
-                            <TextBox Name="tbTime" 
-                                 Grid.Column="2" 
-                                 Style="{StaticResource TextBoxBaseStyle}"
-                                 Visibility="{Binding TimeVisibility}" 
-                                 Text="{Binding Time, StringFormat='hh:mm tt'}" 
-                                 GotFocus="TextBox_GotKeyboardFocus"
-                                 KeyDown="tbTime_KeyDown"
-                                 LostFocus="tbTime_LostFocus">
-                                <TextBox.InputBindings>
-                                    <KeyBinding Command="ApplicationCommands.Redo" Gesture="Ctrl+Shift+Z"/>
-                                </TextBox.InputBindings>
-                            </TextBox>
-                            <TextBox Name="tbComment" 
+                            <TextBlock Grid.Column="1"
+                                 Visibility="{Binding DueDateVisibility}"
+                                 FontWeight="Bold" 
+                                 IsEnabled="{Binding Complete, Converter={StaticResource InverseBooleanConverter}}"
+                                 >Due Wed Jan 28
+                            </TextBlock>
+                            <TextBlock x:Name="tbkPreviousCompletions" 
+                                 Grid.Column="2"  
+                                 IsEnabled="{Binding Complete, Converter={StaticResource InverseBooleanConverter}}"
+                                 >Previous: Mon Jan 29, Sat Jan 27, Thu Jan 25
+                            </TextBlock>
+                            <TextBox x:Name="tbComment" 
                                  Grid.Column="3" 
                                  Style="{StaticResource TextBoxBaseStyle}"
                                  Text="{Binding Comment, UpdateSourceTrigger=PropertyChanged}" 
                                  Margin="20,0,0,0" 
+                                 IsEnabled="{Binding Complete, Converter={StaticResource InverseBooleanConverter}}"
                                  GotFocus="TextBox_GotKeyboardFocus">
                                 <TextBox.InputBindings>
                                     <KeyBinding Command="ApplicationCommands.Redo" Gesture="Ctrl+Shift+Z"/>

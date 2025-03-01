@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -19,6 +20,8 @@ namespace LifeLight
     {
         public ObservableCollection<DailyTodoItem> ocDailyNeeds { get; set; }
         public ObservableCollection<VariableTodoItem> ocVariableNeeds { get; set; }
+        public string? DailyNotes { get; set; }
+        public int Rating { get; set; } = 5;
         public MainWindow()
         {
             InitializeComponent();
@@ -26,11 +29,12 @@ namespace LifeLight
 
             //DateTime today = DateTime.Today;
             //calDate.BlackoutDates.Add(new CalendarDateRange(today.AddDays(1), today.AddYears(1)));
+            
             ocVariableNeeds = new ObservableCollection<VariableTodoItem>
             {
                 new VariableTodoItem() { Title = "Poot" },
                 new VariableTodoItem() { Title = "Fart" },
-                new VariableTodoItem() { Title = "Shart" }
+                new VariableTodoItem() { Title = "Shart", DueDateVisibility = Visibility.Visible }
             };
 
             ocDailyNeeds = new ObservableCollection<DailyTodoItem>

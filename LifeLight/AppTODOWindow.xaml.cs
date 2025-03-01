@@ -40,13 +40,11 @@ namespace LifeLight
             InitializeComponent();
             DataContext = this; // Set the DataContext to this window
 
-            StrAppToDo += "Build out edit menu.";
-            StrAppToDo += "\n\nAdd ListView for optional daily items. Add Frequency property in backend (and in Add / Edit window).";
-            StrAppToDo += "\nItems will show label indicating previous instance and next due based on frequency.";
-            StrAppToDo += "\n\nAdd Edit context menu item to change an entry";
-            StrAppToDo += "\n\nAdd mood rating trackbar";
-            StrAppToDo += "\n\nAdd daily comments textbox";
-            StrAppToDo += "\n\nAdd Reports button to show reports window with checkboxes for each item to report, ";
+            StrAppToDo += "Context menu methods for Variable Items";
+            StrAppToDo += "\n\nHelper windows for Variable Items.";
+            StrAppToDo += "\n\nDates dictionary";
+            StrAppToDo += "\n\nAFTER ALL data structure is built, THEN json storage so I don't have to save notes this way anymore.";
+            StrAppToDo += "\n\nReports button to show reports window with checkboxes for each item to report, ";
             StrAppToDo += "start date calendar, end date calendar, report button on that window.";
         }
 
