@@ -7,24 +7,24 @@ namespace LifeLight
 {
     public partial class SortTodoItemsWindow : Window
     {
-        public ObservableCollection<TodoItem> Items { get; private set; }
-        public ObservableCollection<TodoItem> SortedItems => Items; // For binding
+        public ObservableCollection<DailyTodoItem> Items { get; private set; }
+        public ObservableCollection<DailyTodoItem> SortedItems => Items; // For binding
 
-        public SortTodoItemsWindow(ObservableCollection<TodoItem> sourceItems)
+        public SortTodoItemsWindow(ObservableCollection<DailyTodoItem> sourceItems)
         {
             InitializeComponent();
-            Items = new ObservableCollection<TodoItem>(sourceItems);
+            Items = new ObservableCollection<DailyTodoItem>(sourceItems);
             lbSortList.ItemsSource = SortedItems;
         }
 
         private void lbSortList_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.OriginalSource is FrameworkElement element && element.DataContext is TodoItem draggedItem)
+            if (e.OriginalSource is FrameworkElement element && element.DataContext is DailyTodoItem draggedItem)
             {
                 if (e.LeftButton == MouseButtonState.Pressed)
                 {
                     // Ensure the ListBox is the drag source
-                    DragDrop.DoDragDrop(lbSortList, new DataObject(typeof(TodoItem), draggedItem), DragDropEffects.Move);
+                    DragDrop.DoDragDrop(lbSortList, new DataObject(typeof(DailyTodoItem), draggedItem), DragDropEffects.Move);
                     e.Handled = true; // Prevent other handlers from interfering
                 }
             }
@@ -32,14 +32,14 @@ namespace LifeLight
 
         private void lbSortList_Drop(object sender, DragEventArgs e)
         {
-            if (e.Data.GetData(typeof(TodoItem)) is TodoItem droppedItem)
+            if (e.Data.GetData(typeof(DailyTodoItem)) is DailyTodoItem droppedItem)
             {
                 var target = e.OriginalSource as FrameworkElement;
-                while (target != null && !(target.DataContext is TodoItem))
+                while (target != null && !(target.DataContext is DailyTodoItem))
                 {
                     target = target.Parent as FrameworkElement;
                 }
-                var targetItem = target?.DataContext as TodoItem;
+                var targetItem = target?.DataContext as DailyTodoItem;
                 int oldIndex = Items.IndexOf(droppedItem);
                 int newIndex = targetItem != null ? Items.IndexOf(targetItem) : Items.Count - 1;
 

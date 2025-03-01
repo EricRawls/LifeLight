@@ -17,7 +17,8 @@ namespace LifeLight
 {
     public partial class MainWindow : Window
     {
-        public ObservableCollection<TodoItem> Items { get; set; }
+        public ObservableCollection<DailyTodoItem> ocDailyNeeds { get; set; }
+        public ObservableCollection<VariableTodoItem> ocVariableNeeds { get; set; }
         public MainWindow()
         {
             InitializeComponent();
@@ -25,24 +26,31 @@ namespace LifeLight
 
             //DateTime today = DateTime.Today;
             //calDate.BlackoutDates.Add(new CalendarDateRange(today.AddDays(1), today.AddYears(1)));
-
-            Items = new ObservableCollection<TodoItem>
-                {
-                new TodoItem() { Title = "Morning Benzodiazepine", TimeVisibility = Visibility.Visible },
-                new TodoItem() { Title = "AM Vitamins" },
-                new TodoItem() { Title = "Breakfast", TimeVisibility = Visibility.Visible },
-                new TodoItem() { Title = "AM Brush Teeth / Mouthwash" },
-                new TodoItem() { Title = "Midday Benzodiazepine", TimeVisibility = Visibility.Visible },
-                new TodoItem() { Title = "Lunch", TimeVisibility = Visibility.Visible },
-                new TodoItem() { Title = "Brush Hair" },
-                new TodoItem() { Title = "Exercise" },
-                new TodoItem() { Title = "Supper", TimeVisibility = Visibility.Visible },
-                new TodoItem() { Title = "PM Vitamins" },
-                new TodoItem() { Title = "Night Benzodiazepine", TimeVisibility = Visibility.Visible },
-                new TodoItem() { Title = "PM Brush Teeth / Mouthwash" }
+            ocVariableNeeds = new ObservableCollection<VariableTodoItem>
+            {
+                new VariableTodoItem() { Title = "Poot" },
+                new VariableTodoItem() { Title = "Fart" },
+                new VariableTodoItem() { Title = "Shart" }
             };
 
-            lvTodoList.ItemsSource = Items;
+            ocDailyNeeds = new ObservableCollection<DailyTodoItem>
+                {
+                new DailyTodoItem() { Title = "Morning Benzodiazepine", TimeVisibility = Visibility.Visible },
+                new DailyTodoItem() { Title = "AM Vitamins" },
+                new DailyTodoItem() { Title = "Breakfast", TimeVisibility = Visibility.Visible },
+                new DailyTodoItem() { Title = "AM Brush Teeth / Mouthwash" },
+                new DailyTodoItem() { Title = "Midday Benzodiazepine", TimeVisibility = Visibility.Visible },
+                new DailyTodoItem() { Title = "Lunch", TimeVisibility = Visibility.Visible },
+                new DailyTodoItem() { Title = "Brush Hair" },
+                new DailyTodoItem() { Title = "Exercise" },
+                new DailyTodoItem() { Title = "Supper", TimeVisibility = Visibility.Visible },
+                new DailyTodoItem() { Title = "PM Vitamins" },
+                new DailyTodoItem() { Title = "Night Benzodiazepine", TimeVisibility = Visibility.Visible },
+                new DailyTodoItem() { Title = "PM Brush Teeth / Mouthwash" }
+            };
+
+            lvDailyNeeds.ItemsSource = ocDailyNeeds;
+            lvVariableNeeds.ItemsSource = ocVariableNeeds;
         }
 
         private void btnAppTODO_Click(object sender, RoutedEventArgs e)
@@ -71,7 +79,7 @@ namespace LifeLight
         {
             if (e.Key == Key.Enter)
             {
-                if (sender is TextBox tb && tb.DataContext is TodoItem item)
+                if (sender is TextBox tb && tb.DataContext is DailyTodoItem item)
                 {
                     tbTime_Validate(tb, item);
                     e.Handled = true; // Prevent further processing (e.g., newline)
@@ -81,13 +89,13 @@ namespace LifeLight
 
         private void tbTime_LostFocus(object sender, RoutedEventArgs e)
         {
-            if (sender is TextBox tb && tb.DataContext is TodoItem item)
+            if (sender is TextBox tb && tb.DataContext is DailyTodoItem item)
             {
                 tbTime_Validate(tb, item);
             }
         }
 
-        private void tbTime_Validate(TextBox tb, TodoItem item)
+        private void tbTime_Validate(TextBox tb, DailyTodoItem item)
         {
             if (DateTime.TryParse(tb.Text, out DateTime time))
             {
@@ -105,70 +113,84 @@ namespace LifeLight
         private void cbComplete_Click(object sender, RoutedEventArgs e)
         {
             //MessageBox.Show("CheckBox clicked!");
-            if (sender is CheckBox cb && cb.DataContext is TodoItem item)
+            if (sender is CheckBox cb && cb.DataContext is DailyTodoItem item)
             {
                 item.Complete = cb.IsChecked ?? false; // Update Complete based on IsChecked
             }
         }
 
-        private void AddAbove_Click(object sender, RoutedEventArgs e)
+        private void AddAboveDaily_Click(object sender, RoutedEventArgs e)
         {
-            int index = lvTodoList.SelectedIndex;
+            int index = lvDailyNeeds.SelectedIndex;
             if (index >= 0)
             {
-                ShowAddItemWindow(index);
+                ShowAddDailyItemWindow(index);
             }
             else
             {
-                ShowAddItemWindow(0); // Default to top if nothing selected
+                ShowAddDailyItemWindow(0); // Default to top if nothing selected
             }
         }
 
-        private void AddBelow_Click(object sender, RoutedEventArgs e)
+        private void AddBelowDaily_Click(object sender, RoutedEventArgs e)
         {
-            int index = lvTodoList.SelectedIndex;
+            int index = lvDailyNeeds.SelectedIndex;
             if (index >= 0)
             {
-                ShowAddItemWindow(index + 1);
+                ShowAddDailyItemWindow(index + 1);
             }
             else
             {
-                ShowAddItemWindow(Items.Count); // Default to end if nothing selected
+                ShowAddDailyItemWindow(ocDailyNeeds.Count); // Default to end if nothing selected
             }
         }
 
-        private void DeleteItem_Click(object sender, RoutedEventArgs e)
+        private void EditDailyItem_Click(object sender, RoutedEventArgs e)
         {
-            if (lvTodoList.SelectedItem is TodoItem selectedItem)
+            int index = lvDailyNeeds.SelectedIndex;
+            if (index >= 0)
+            {
+                var editWindow = new EditDailyItemWindow(ocDailyNeeds[index]) { Owner = this };
+                if (editWindow.ShowDialog() == true)
+                {
+                    // Update the existing item with new values
+                    ocDailyNeeds[index].Title = editWindow.NewTitle!;
+                    ocDailyNeeds[index].TimeVisibility = editWindow.NewTimeVisibility;
+                }
+            }
+        }
+        private void DeleteDailyItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (lvDailyNeeds.SelectedItem is DailyTodoItem selectedItem)
             {
                 var dialog = new ConfirmDialog(this, "Are you sure you want to delete this item?", "Confirm Deletion");
-                if (dialog.ShowDialog() == true) // ShowDialog centers it over the owner window
+                if (dialog.ShowDialog() == true)
                 {
-                    Items.Remove(selectedItem);
+                    ocDailyNeeds.Remove(selectedItem);
                 }
             }
         }
 
-        private void SortList_Click(object sender, RoutedEventArgs e)
+        private void SortDailyItems_Click(object sender, RoutedEventArgs e)
         {
-            var sortWindow = new SortTodoItemsWindow(new ObservableCollection<TodoItem>(Items)) { Owner = this };
+            var sortWindow = new SortTodoItemsWindow(new ObservableCollection<DailyTodoItem>(ocDailyNeeds)) { Owner = this };
             if (sortWindow.ShowDialog() == true)
             {
-                Items.Clear();
+                ocDailyNeeds.Clear();
                 foreach (var item in sortWindow.SortedItems)
                 {
-                    Items.Add(item);
+                    ocDailyNeeds.Add(item);
                 }
             }
         }
 
-        private void ShowAddItemWindow(int insertIndex)
+        private void ShowAddDailyItemWindow(int insertIndex)
         {
-            var addWindow = new AddTodoItemWindow { Owner = this };
+            var addWindow = new AddDailyItemWindow { Owner = this };
             if (addWindow.ShowDialog() == true)
             {
-                Items.Insert(insertIndex >= 0 ? insertIndex : Items.Count,
-                    new TodoItem
+                ocDailyNeeds.Insert(insertIndex >= 0 ? insertIndex : ocDailyNeeds.Count,
+                    new DailyTodoItem
                     {
                         Title = addWindow.NewTitle!,
                         TimeVisibility = addWindow.NewTimeVisibility
@@ -178,9 +200,9 @@ namespace LifeLight
 
         private void btnSetNow_Click(object sender, RoutedEventArgs e)
         {
-            if (lvTodoList.SelectedIndex >= 0)
+            if (lvDailyNeeds.SelectedIndex >= 0)
             {
-                var selectedItem = Items[lvTodoList.SelectedIndex];
+                var selectedItem = ocDailyNeeds[lvDailyNeeds.SelectedIndex];
                 selectedItem.Time = DateTime.Now;
                 //MessageBox.Show($"Time set to: {selectedItem.Time.ToString("hh:mm tt")}");
             }
@@ -218,7 +240,7 @@ namespace LifeLight
 
 }
 
-public class TodoItem : INotifyPropertyChanged
+public class DailyTodoItem : INotifyPropertyChanged
 {
     private string _title = "";
     private bool _complete;
@@ -250,6 +272,53 @@ public class TodoItem : INotifyPropertyChanged
     {
         get => _timeVisibility;
         set { _timeVisibility = value; OnPropertyChanged(); }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+}
+
+public class VariableTodoItem : INotifyPropertyChanged
+{
+    private string _title = "";
+    private bool _complete;
+    private DateTime _date;
+    private int _daysFrequency = 1;
+    private string _comment = "";
+    private Visibility _dueDateVisibility = Visibility.Hidden;
+
+    public required string Title
+    {
+        get => _title;
+        set { _title = value; OnPropertyChanged(); }
+    }
+    public bool Complete
+    {
+        get => _complete;
+        set { _complete = value; OnPropertyChanged(); }
+    }
+    public DateTime Time
+    {
+        get => _date;
+        set { _date = value; OnPropertyChanged(); }
+    }
+    public string Comment
+    {
+        get => _comment;
+        set { _comment = value; OnPropertyChanged(); }
+    }
+    public int DaysFrequency
+    {
+        get => _daysFrequency;
+        set { _daysFrequency = value; OnPropertyChanged(); }
+    }
+    public Visibility DueDateVisibility
+    {
+        get => _dueDateVisibility;
+        set { _dueDateVisibility = value; OnPropertyChanged(); }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
