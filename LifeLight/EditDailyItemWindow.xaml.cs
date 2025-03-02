@@ -3,20 +3,17 @@ using System.Windows.Input;
 
 namespace LifeLight
 {
-    /// <summary>
-    /// Interaction logic for EditDailyItemWindow.xaml
-    /// </summary>
     public partial class EditDailyItemWindow : Window
     {
         public string? NewTitle { get; private set; }
         public Visibility NewTimeVisibility { get; private set; }
-        private DailyTodoItem _originalItem;
+        //private DailyTodoItem _originalItem;
 
         // Constructor that accepts the item to edit
         public EditDailyItemWindow(DailyTodoItem item)
         {
             InitializeComponent();
-            _originalItem = item;
+            //_originalItem = item;
 
             // Populate controls with existing data
             txtTitle.Text = item.Title;
@@ -48,12 +45,5 @@ namespace LifeLight
             Close();
         }
 
-        private void TxtTitle_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-            {
-                OK_Click(sender, e);
-            }
-        }
     }
 }

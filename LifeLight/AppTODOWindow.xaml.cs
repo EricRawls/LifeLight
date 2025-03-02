@@ -40,11 +40,12 @@ namespace LifeLight
             InitializeComponent();
             DataContext = this; // Set the DataContext to this window
 
-            StrAppToDo += "Context menu methods for Variable Items";
-            StrAppToDo += "\n\nHelper windows for Variable Items.";
-            StrAppToDo += "\n\nDates dictionary";
+            StrAppToDo += "Dates dictionary";
+            StrAppToDo += "\n\nDue date logic for variable items. If due today then color red.";
+            StrAppToDo += "\n\nBuild calendar functionality.";
             StrAppToDo += "\n\nAFTER ALL data structure is built, THEN json storage so I don't have to save notes this way anymore.";
             StrAppToDo += "\n\nReports button to show reports window with checkboxes for each item to report, ";
+            StrAppToDo += "\n\nGraph report for slider history.";
             StrAppToDo += "start date calendar, end date calendar, report button on that window.";
         }
 

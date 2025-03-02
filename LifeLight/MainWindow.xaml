@@ -111,6 +111,7 @@
                             </Grid.ColumnDefinitions>
                             <CheckBox x:Name="cbComplete" 
                                   IsChecked="{Binding Complete, UpdateSourceTrigger=PropertyChanged}" 
+                                  VerticalAlignment="Center"
                                   Focusable="True" 
                                   IsHitTestVisible="True" 
                                   IsTabStop="True"
@@ -189,12 +190,13 @@
                         <Grid Margin="0,2" IsHitTestVisible="True" Focusable="True" KeyboardNavigation.IsTabStop="False">
                             <Grid.ContextMenu>
                                 <ContextMenu x:Name="cmVariableNeeds">
-                                    <!--<MenuItem Header="Add Item Above" Click="AddAboveDaily_Click"/>
-                                    <MenuItem Header="Add Item Below" Click="AddBelowDaily_Click"/>
+                                    <MenuItem Header="Add Item Above" Click="AddAboveVariable_Click"/>
+                                    <MenuItem Header="Add Item Below" Click="AddBelowVariable_Click"/>
+                                    <MenuItem Header="Edit Item" Click="EditVariableItem_Click"/>
                                     <Separator/>
-                                    <MenuItem Header="Delete Item" Click="DeleteDailyItem_Click"/>
+                                    <MenuItem Header="Delete Item" Click="DeleteVariableItem_Click"/>
                                     <Separator/>
-                                    <MenuItem Header="Sort List" Click="SortDailyItems_Click"/>-->
+                                    <MenuItem Header="Sort List" Click="SortVariableItems_Click"/>
                                 </ContextMenu>
                             </Grid.ContextMenu>
                             <Grid.ColumnDefinitions>
@@ -205,6 +207,7 @@
                             </Grid.ColumnDefinitions>
                             <CheckBox x:Name="cbComplete" 
                                   IsChecked="{Binding Complete, UpdateSourceTrigger=PropertyChanged}" 
+                                  VerticalAlignment="Center"
                                   Focusable="True" 
                                   IsHitTestVisible="True" 
                                   IsTabStop="True"

@@ -11,6 +11,7 @@ namespace LifeLight
         public AddDailyItemWindow()
         {
             InitializeComponent();
+            //todo test whether this is needed
             NewTimeVisibility = Visibility.Hidden; // Default value
         }
 
@@ -33,14 +34,6 @@ namespace LifeLight
         {
             DialogResult = false;
             Close();
-        }
-
-        private void TxtTitle_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-            {
-                OK_Click(sender, e);
-            }
         }
     }
 }

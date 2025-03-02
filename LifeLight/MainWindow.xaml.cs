@@ -25,16 +25,16 @@ namespace LifeLight
         public MainWindow()
         {
             InitializeComponent();
-            CommandBindings.Add(new CommandBinding(ApplicationCommands.Redo, ExecuteRedo));
 
+            CommandBindings.Add(new CommandBinding(ApplicationCommands.Redo, ExecuteRedo));
             //DateTime today = DateTime.Today;
             //calDate.BlackoutDates.Add(new CalendarDateRange(today.AddDays(1), today.AddYears(1)));
             
             ocVariableNeeds = new ObservableCollection<VariableTodoItem>
             {
-                new VariableTodoItem() { Title = "Poot" },
+                new VariableTodoItem() { Title = "Poot", DaysFrequency = 2 },
                 new VariableTodoItem() { Title = "Fart" },
-                new VariableTodoItem() { Title = "Shart", DueDateVisibility = Visibility.Visible }
+                new VariableTodoItem() { Title = "Shart" }
             };
 
             ocDailyNeeds = new ObservableCollection<DailyTodoItem>
@@ -109,7 +109,7 @@ namespace LifeLight
             }
             else
             {
-                MessageBox.Show("Please enter a valid time (e.g., 01:30 PM).", "Invalid Time", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Please enter a valid time (e.g., 01:30 PM or 13:30).", "Invalid Time", MessageBoxButton.OK, MessageBoxImage.Warning);
                 tb.Text = item.Time.ToString("hh:mm tt"); // Revert to last valid value
             }
         }
@@ -120,6 +120,92 @@ namespace LifeLight
             if (sender is CheckBox cb && cb.DataContext is DailyTodoItem item)
             {
                 item.Complete = cb.IsChecked ?? false; // Update Complete based on IsChecked
+            }
+        }
+
+        private void AddAboveVariable_Click(object sender, RoutedEventArgs e)
+        {
+            int index = lvVariableNeeds.SelectedIndex;
+            if (index >= 0)
+            {
+                ShowAddVariableItemWindow(index);
+            }
+            else
+            {
+                ShowAddVariableItemWindow(0); // Default to top if nothing selected
+            }
+        }
+
+        private void AddBelowVariable_Click(object sender, RoutedEventArgs e)
+        {
+            int index = lvVariableNeeds.SelectedIndex;
+            if (index >= 0)
+            {
+                ShowAddVariableItemWindow(index + 1);
+            }
+            else
+            {
+                ShowAddVariableItemWindow(ocVariableNeeds.Count); // Default to end if nothing selected
+            }
+        }
+
+        private void EditVariableItem_Click(object sender, RoutedEventArgs e)
+        {
+            int index = lvVariableNeeds.SelectedIndex;
+            if (index >= 0)
+            {
+                var editWindow = new EditVariableItemWindow(ocVariableNeeds[index]) { Owner = this };
+                if (editWindow.ShowDialog() == true)
+                {
+                    //Update the existing item with new values
+                    ocVariableNeeds[index].Title = editWindow.NewTitle!;
+                    ocVariableNeeds[index].DaysFrequency = editWindow.NewDaysFrequency;
+                    ocVariableNeeds[index].DueDateVisibility = editWindow.NewDueDateVisibility;
+                }
+            }
+        }
+        private void DeleteVariableItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (lvVariableNeeds.SelectedItem is VariableTodoItem selectedItem)
+            {
+                var dialog = new ConfirmDialog(this, "Are you sure you want to delete this item?", "Confirm Deletion");
+                if (dialog.ShowDialog() == true)
+                {
+                    ocVariableNeeds.Remove(selectedItem);
+                }
+            }
+        }
+
+        private void SortVariableItems_Click(object sender, RoutedEventArgs e)
+        {
+            if (ocVariableNeeds.Count == 0)
+            {
+                MessageBox.Show("No items to sort.", "Sort Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            var sortWindow = new SortTodoItemsWindow(new ObservableCollection<VariableTodoItem>(ocVariableNeeds)) { Owner = this };
+            if (sortWindow.ShowDialog() == true)
+            {
+                ocVariableNeeds.Clear();
+                foreach (var item in sortWindow.SortedVariableItems!)
+                {
+                    ocVariableNeeds.Add(item);
+                }
+            }
+        }
+
+        private void ShowAddVariableItemWindow(int insertIndex)
+        {
+            var addWindow = new AddVariableItemWindow { Owner = this };
+            if (addWindow.ShowDialog() == true)
+            {
+                ocVariableNeeds.Insert(insertIndex >= 0 ? insertIndex : ocVariableNeeds.Count,
+                    new VariableTodoItem
+                    {
+                        Title = addWindow.NewTitle!,
+                        DueDateVisibility = addWindow.NewDueDateVisibility,
+                        DaysFrequency = addWindow.NewDaysFrequency
+                    });
             }
         }
 
@@ -177,11 +263,16 @@ namespace LifeLight
 
         private void SortDailyItems_Click(object sender, RoutedEventArgs e)
         {
+            if (ocDailyNeeds.Count == 0)
+            {
+                MessageBox.Show("No items to sort.", "Sort Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
             var sortWindow = new SortTodoItemsWindow(new ObservableCollection<DailyTodoItem>(ocDailyNeeds)) { Owner = this };
             if (sortWindow.ShowDialog() == true)
             {
                 ocDailyNeeds.Clear();
-                foreach (var item in sortWindow.SortedItems)
+                foreach (var item in sortWindow.SortedDailyItems!)
                 {
                     ocDailyNeeds.Add(item);
                 }
@@ -289,10 +380,9 @@ public class VariableTodoItem : INotifyPropertyChanged
 {
     private string _title = "";
     private bool _complete;
-    private DateTime _date;
-    private int _daysFrequency = 1;
+    private int _daysFrequency = 0;
     private string _comment = "";
-    private Visibility _dueDateVisibility = Visibility.Hidden;
+    private Visibility _dueDateVisibility =  Visibility.Hidden;
 
     public required string Title
     {
@@ -304,11 +394,6 @@ public class VariableTodoItem : INotifyPropertyChanged
         get => _complete;
         set { _complete = value; OnPropertyChanged(); }
     }
-    public DateTime Time
-    {
-        get => _date;
-        set { _date = value; OnPropertyChanged(); }
-    }
     public string Comment
     {
         get => _comment;
@@ -317,7 +402,10 @@ public class VariableTodoItem : INotifyPropertyChanged
     public int DaysFrequency
     {
         get => _daysFrequency;
-        set { _daysFrequency = value; OnPropertyChanged(); }
+        set { 
+            _daysFrequency = value;
+            DueDateVisibility = value > 0 ? Visibility.Visible : Visibility.Hidden; // Show due date if frequency is set
+            OnPropertyChanged(); }
     }
     public Visibility DueDateVisibility
     {
