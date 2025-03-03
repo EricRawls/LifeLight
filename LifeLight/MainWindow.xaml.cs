@@ -1,4 +1,5 @@
 ﻿using LifeLight;
+using Microsoft.VisualBasic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
@@ -21,24 +22,47 @@ namespace LifeLight
     public partial class MainWindow : Window
     {
         public Dictionary<DateTime, DateLog> Log { get; set; } = [];
-       
+
         private readonly DispatcherTimer _dateCheckTimer;
-        
+
         private DateTime _lastCheckedDate;
-   
+
         private DateTime SelectedDay;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            // Initialize the last checked date to the current day
-            //_lastCheckedDate = DateTime.Today;
+            MaxHeight = SystemParameters.WorkArea.Height;
+
+            Loaded += (s, e) =>
+            {
+                double bottomEdge = Top + ActualHeight;
+                double workingAreaBottom = SystemParameters.WorkArea.Top + SystemParameters.WorkArea.Height;
+                if (bottomEdge > workingAreaBottom)
+                {
+                    double overflow = bottomEdge - workingAreaBottom;
+                    Top -= overflow;
+                    if (Top < SystemParameters.WorkArea.Top) Top = SystemParameters.WorkArea.Top;
+                }
+            };
+
+            SizeChanged += (s, e) =>
+            {
+                double bottomEdge = Top + ActualHeight;
+                double workingAreaBottom = SystemParameters.WorkArea.Top + SystemParameters.WorkArea.Height;
+                if (bottomEdge > workingAreaBottom)
+                {
+                    double overflow = bottomEdge - workingAreaBottom;
+                    Top -= overflow;
+                    if (Top < SystemParameters.WorkArea.Top) Top = SystemParameters.WorkArea.Top;
+                }
+            };
+
+            // Initialize the last checked date to yesterday. This will autopopulate today if needed.
             _lastCheckedDate = DateTime.Today.AddDays(-1);
 
-
-
-            // Set up a timer to check every second
+            // Set up a timer to check for midnight rollover
             _dateCheckTimer = new DispatcherTimer
             {
                 Interval = TimeSpan.FromSeconds(1)
@@ -50,10 +74,43 @@ namespace LifeLight
 
             SelectedDay = DateTime.Today;
             AddDayToLog(SelectedDay);
+            PopulateDummyData();
+            // Update LastCompletedDate for each VariableTodoItem
+            foreach (var vn in Log[SelectedDay].VariableNeeds)
+            {
+                vn.UpdateLastCompletedDate(Log); // Pass the entire Log dictionary
+            }
             lvDailyNeeds.ItemsSource = Log[SelectedDay].DailyNeeds;
             lvVariableNeeds.ItemsSource = Log[SelectedDay].VariableNeeds;
             DailyDetailsPanel.DataContext = Log[SelectedDay];
 
+        }
+
+        private void PopulateDummyData()
+        {
+            // Populate with dummy data for testing
+            Log[SelectedDay].VariableNeeds =
+            [
+                new VariableTodoItem() { Title = "Poot", DaysFrequency = 2 },
+                new VariableTodoItem() { Title = "Fart" },
+                new VariableTodoItem() { Title = "Shart" }
+            ];
+
+            Log[SelectedDay].DailyNeeds =
+                [
+                new DailyTodoItem() { Title = "Morning Benzodiazepine", TimeVisibility = Visibility.Visible },
+                new DailyTodoItem() { Title = "AM Vitamins" },
+                new DailyTodoItem() { Title = "Breakfast", TimeVisibility = Visibility.Visible },
+                new DailyTodoItem() { Title = "AM Brush Teeth / Mouthwash" },
+                new DailyTodoItem() { Title = "Midday Benzodiazepine", TimeVisibility = Visibility.Visible },
+                new DailyTodoItem() { Title = "Lunch", TimeVisibility = Visibility.Visible },
+                new DailyTodoItem() { Title = "Brush Hair" },
+                new DailyTodoItem() { Title = "Exercise" },
+                new DailyTodoItem() { Title = "Supper", TimeVisibility = Visibility.Visible },
+                new DailyTodoItem() { Title = "PM Vitamins" },
+                new DailyTodoItem() { Title = "Night Benzodiazepine", TimeVisibility = Visibility.Visible },
+                new DailyTodoItem() { Title = "PM Brush Teeth / Mouthwash" },
+            ];
         }
 
         private void AddDayToLog(DateTime selectedDate)
@@ -373,51 +430,56 @@ namespace LifeLight
         private void CalDate_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
             if (!CalDate.SelectedDate.HasValue) return;
+            
             SelectedDay = CalDate.SelectedDate.Value;
+            
             AddDayToLog(SelectedDay);
+            
+            SetColorsForDate();
+   
+            // Update LastCompletedDate for each VariableTodoItem
+            foreach (var vn in Log[SelectedDay].VariableNeeds)
+            {
+                vn.UpdateLastCompletedDate(Log); // Pass the entire Log dictionary
+            }
+
+            // Style the TextBlocks manually
+            foreach (var item in lvVariableNeeds.Items)
+            {
+                var container = lvVariableNeeds.ItemContainerGenerator.ContainerFromItem(item) as FrameworkElement;
+                if (container != null)
+                {
+                    var textBlock = container.FindName("tblkDueDate") as TextBlock;
+                    if (textBlock != null && item is VariableTodoItem vti && vti.DueDate.HasValue)
+                    {
+                        TimeSpan difference = vti.DueDate.Value - SelectedDay;
+
+                        if (difference.Days == 0)
+                        {
+                            textBlock.Text = "Due Today";
+                            textBlock.Foreground = Brushes.Black;
+                            textBlock.FontWeight = FontWeights.Bold;
+                        }
+                        else
+                        {
+                            textBlock.Text = $"Due {vti.DueDate.Value:ddd MMM dd}";
+                            textBlock.Foreground = difference.Days < 0 ? Brushes.Red : Brushes.Black;
+                            textBlock.FontWeight = FontWeights.Normal;
+                        }
+                    }
+                }
+            }
+
             DailyDetailsPanel.DataContext = Log[SelectedDay];
             lvDailyNeeds.ItemsSource = Log[SelectedDay].DailyNeeds;
             lvVariableNeeds.ItemsSource = Log[SelectedDay].VariableNeeds;
-            SetColorsForDate();
         }
 
         private void BtnExport_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show("Export clicked!");
         }
-
     }
-    public class InverseBooleanConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            if (value is bool boolean)
-                return !boolean;
-            return value;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            if (value is bool boolean)
-                return !boolean;
-            return value;
-        }
-    }
-
-    public class CountToVisibilityConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            int count = (int)value;
-            return count == 0 ? Visibility.Visible : Visibility.Collapsed;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException(); // No need for two-way binding here
-        }
-    }
-
     public class DailyTodoItem : INotifyPropertyChanged
     {
         private string _title = "";
@@ -482,6 +544,7 @@ namespace LifeLight
         private int _daysFrequency = 0;
         private string _comment = "";
         private Visibility _dueDateVisibility = Visibility.Hidden;
+        private DateTime? _lastCompletedDate;
 
         public required string Title
         {
@@ -514,11 +577,53 @@ namespace LifeLight
             set { _dueDateVisibility = value; OnPropertyChanged(); }
         }
 
+        public DateTime? LastCompletedDate
+        {
+            get => _lastCompletedDate;
+            set
+            {
+                _lastCompletedDate = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(DueDate)); // Trigger DueDate recalculation
+            }
+        }
+
+        public DateTime? DueDate => DaysFrequency > 0 && LastCompletedDate.HasValue
+            ? LastCompletedDate.Value.AddDays(DaysFrequency)
+            : null;
+
+        // Method to find and set last completion date from the log
+        public void UpdateLastCompletedDate(Dictionary<DateTime, DateLog> log)
+        {
+            if (DaysFrequency <= 0) return;
+
+            DateTime today = DateTime.Today;
+            DateTime checkDate = today;
+
+            while (checkDate >= log.Keys.Min())
+            {
+                if (log.TryGetValue(checkDate, out DateLog? dateLog))
+                {
+                    var completedItem = dateLog.VariableNeeds
+                        .FirstOrDefault(v => v.Title == this.Title && v.Complete);
+
+                    if (completedItem != null)
+                    {
+                        LastCompletedDate = checkDate;
+                        return;
+                    }
+                }
+                checkDate = checkDate.AddDays(-1);
+            }
+            LastCompletedDate = null; // No completion found
+        }
+
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
     }
 
     public class DateLog : INotifyPropertyChanged
@@ -554,4 +659,36 @@ namespace LifeLight
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
+
+    public class InverseBooleanConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value is bool boolean)
+                return !boolean;
+            return value;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value is bool boolean)
+                return !boolean;
+            return value;
+        }
+    }
+
+    public class CountToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            int count = (int)value;
+            return count == 0 ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException(); // No need for two-way binding here
+        }
+    }
+
 }
