@@ -11,8 +11,7 @@ namespace LifeLight
         public AddDailyItemWindow()
         {
             InitializeComponent();
-            //todo test whether this is needed
-            NewTimeVisibility = Visibility.Hidden; // Default value
+            txtTitle.Focus();
         }
 
         private void OK_Click(object sender, RoutedEventArgs e)

@@ -73,7 +73,6 @@
                   KeyboardNavigation.DirectionalNavigation="Cycle">
                     <ListView.ItemContainerStyle>
                         <Style TargetType="ListViewItem">
-                            <Setter Property="AllowDrop" Value="True"/>
                             <Setter Property="Focusable" Value="True"/>
                             <Setter Property="IsHitTestVisible" Value="True"/>
                             <Setter Property="KeyboardNavigation.TabNavigation" Value="Local"/>
@@ -97,17 +96,6 @@
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Grid Margin="0,2" IsHitTestVisible="True" Focusable="True" KeyboardNavigation.IsTabStop="False">
-                                <Grid.ContextMenu>
-                                    <ContextMenu x:Name="cmDailyNeeds">
-                                        <MenuItem Header="Add Item Above" Click="AddAboveDaily_Click"/>
-                                        <MenuItem Header="Add Item Below" Click="AddBelowDaily_Click"/>
-                                        <MenuItem Header="Edit Item" Click="EditDailyItem_Click"/>
-                                        <Separator/>
-                                        <MenuItem Header="Delete Item" Click="DeleteDailyItem_Click"/>
-                                        <Separator/>
-                                        <MenuItem Header="Sort List" Click="SortDailyItems_Click"/>
-                                    </ContextMenu>
-                                </Grid.ContextMenu>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="240"/>
                                     <ColumnDefinition Width="100"/>
@@ -131,19 +119,28 @@
                             </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>
+                    <ListView.ContextMenu>
+                        <ContextMenu x:Name="cmDailyNeeds">
+                            <MenuItem Header="Add Item Above" Click="AddAboveDaily_Click"/>
+                            <MenuItem Header="Add Item Below" Click="AddBelowDaily_Click"/>
+                            <MenuItem Header="Edit Item" Click="EditDailyItem_Click"/>
+                            <Separator/>
+                            <MenuItem Header="Delete Item" Click="DeleteDailyItem_Click"/>
+                            <Separator/>
+                            <MenuItem Header="Sort List" Click="SortDailyItems_Click"/>
+                        </ContextMenu>
+                    </ListView.ContextMenu>
                 </ListView>
                 <Border Background="#F0F0F0" Opacity="0.8" 
                         Visibility="{Binding Items.Count, ElementName=lvDailyNeeds, Converter={StaticResource CountToVisibilityConverter}}">
-                    <TextBlock Text="Right-click to add a daily task" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="14" Foreground="Gray">
-                        <TextBlock.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem Header="Add Daily Task" Click="AddAboveDaily_Click"/>
-                            </ContextMenu>
-                        </TextBlock.ContextMenu>
-                    </TextBlock>
+                    <Border.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Add Daily Task" Click="AddAboveDaily_Click"/>
+                        </ContextMenu>
+                    </Border.ContextMenu>
+                    <TextBlock Text="Right-click to add a daily task" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="14" Foreground="Gray"/>
                 </Border>
             </Grid>
-
             <TextBlock Margin="0,10,0,0">Variable Items</TextBlock>
             <Grid>
                 <ListView x:Name="lvVariableNeeds"
@@ -154,7 +151,6 @@
                   KeyboardNavigation.DirectionalNavigation="Cycle">
                     <ListView.ItemContainerStyle>
                         <Style TargetType="ListViewItem">
-                            <Setter Property="AllowDrop" Value="True"/>
                             <Setter Property="Focusable" Value="True"/>
                             <Setter Property="IsHitTestVisible" Value="True"/>
                             <Setter Property="KeyboardNavigation.TabNavigation" Value="Local"/>
@@ -178,17 +174,6 @@
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Grid Margin="0,2" IsHitTestVisible="True" Focusable="True" KeyboardNavigation.IsTabStop="False">
-                                <Grid.ContextMenu>
-                                    <ContextMenu x:Name="cmVariableNeeds">
-                                        <MenuItem Header="Add Item Above" Click="AddAboveVariable_Click"/>
-                                        <MenuItem Header="Add Item Below" Click="AddBelowVariable_Click"/>
-                                        <MenuItem Header="Edit Item" Click="EditVariableItem_Click"/>
-                                        <Separator/>
-                                        <MenuItem Header="Delete Item" Click="DeleteVariableItem_Click"/>
-                                        <Separator/>
-                                        <MenuItem Header="Sort List" Click="SortVariableItems_Click"/>
-                                    </ContextMenu>
-                                </Grid.ContextMenu>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="240"/>
                                     <ColumnDefinition Width="160"/>
@@ -208,17 +193,27 @@
                             </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>
+                    <ListView.ContextMenu>
+                        <ContextMenu x:Name="cmVariableNeeds">
+                            <MenuItem Header="Add Item Above" Click="AddAboveVariable_Click"/>
+                            <MenuItem Header="Add Item Below" Click="AddBelowVariable_Click"/>
+                            <MenuItem Header="Edit Item" Click="EditVariableItem_Click"/>
+                            <Separator/>
+                            <MenuItem Header="Delete Item" Click="DeleteVariableItem_Click"/>
+                            <Separator/>
+                            <MenuItem Header="Sort List" Click="SortVariableItems_Click"/>
+                         </ContextMenu>
+                    </ListView.ContextMenu>
                 </ListView>
                 <!-- Empty State Overlay -->
                 <Border Background="#F0F0F0" Opacity="0.8" 
                         Visibility="{Binding Items.Count, ElementName=lvVariableNeeds, Converter={StaticResource CountToVisibilityConverter}}">
-                    <TextBlock Text="Right-click to add a variable task" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="14" Foreground="Gray">
-                        <TextBlock.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem Header="Add Variable Task" Click="AddAboveVariable_Click"/>
-                            </ContextMenu>
-                        </TextBlock.ContextMenu>
-                    </TextBlock>
+                    <Border.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Add Variable Task" Click="AddAboveVariable_Click"/>
+                        </ContextMenu>
+                    </Border.ContextMenu>
+                    <TextBlock Text="Right-click to add a variable task" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="14" Foreground="Gray"/>
                 </Border>
             </Grid>
         </StackPanel>

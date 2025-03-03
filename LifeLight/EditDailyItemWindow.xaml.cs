@@ -7,21 +7,19 @@ namespace LifeLight
     {
         public string? NewTitle { get; private set; }
         public Visibility NewTimeVisibility { get; private set; }
-        //private DailyTodoItem _originalItem;
 
-        // Constructor that accepts the item to edit
         public EditDailyItemWindow(DailyTodoItem item)
         {
             InitializeComponent();
-            //_originalItem = item;
 
-            // Populate controls with existing data
             txtTitle.Text = item.Title;
             cbShowTime.IsChecked = item.TimeVisibility == Visibility.Visible;
 
-            // Set initial return values
             NewTitle = item.Title;
             NewTimeVisibility = item.TimeVisibility;
+
+            txtTitle.SelectionStart = txtTitle.Text.Length;
+            txtTitle.Focus();
         }
 
         private void OK_Click(object sender, RoutedEventArgs e)

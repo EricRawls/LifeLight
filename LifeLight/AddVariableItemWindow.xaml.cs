@@ -25,8 +25,7 @@ namespace LifeLight
         public AddVariableItemWindow()
         {
             InitializeComponent();
-            //todo test whether this is needed
-            NewDueDateVisibility = Visibility.Hidden; // Default value
+            txtTitle.Focus();
         }
         private void OK_Click(object sender, RoutedEventArgs e)
         {

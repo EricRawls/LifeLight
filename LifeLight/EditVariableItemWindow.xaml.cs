@@ -24,15 +24,15 @@ namespace LifeLight
         {
             InitializeComponent();
 
-            // Populate controls with existing data
             txtTitle.Text = item.Title;
             txtFrequency.Text = item.DaysFrequency.ToString();
 
-            // Set initial return values
             NewTitle = item.Title;
             NewDueDateVisibility = item.DueDateVisibility;
             NewDaysFrequency = item.DaysFrequency;
 
+            txtTitle.SelectionStart = txtTitle.Text.Length;
+            txtTitle.Focus();
         }
         private void OK_Click(object sender, RoutedEventArgs e)
         {

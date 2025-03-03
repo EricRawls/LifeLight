@@ -40,7 +40,8 @@ namespace LifeLight
             InitializeComponent();
             DataContext = this; // Set the DataContext to this window
 
-            StrAppToDo += "Dates dictionary";
+            StrAppToDo += "Add dummy items.";
+            StrAppToDo += "\n\nCheck sort window for autoscroll";
             StrAppToDo += "\n\nDue date logic for variable items. If due today then background color yellow. Checking complete should update due date.";
             StrAppToDo += "\n\nBuild calendar functionality.";
             StrAppToDo += "\n\nAFTER ALL data structure is built, THEN json storage so I don't have to save notes this way anymore.";
