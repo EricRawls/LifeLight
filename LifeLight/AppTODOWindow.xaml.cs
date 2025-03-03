@@ -41,7 +41,7 @@ namespace LifeLight
             DataContext = this; // Set the DataContext to this window
 
             StrAppToDo += "Dates dictionary";
-            StrAppToDo += "\n\nDue date logic for variable items. If due today then color red.";
+            StrAppToDo += "\n\nDue date logic for variable items. If due today then background color yellow. Checking complete should update due date.";
             StrAppToDo += "\n\nBuild calendar functionality.";
             StrAppToDo += "\n\nAFTER ALL data structure is built, THEN json storage so I don't have to save notes this way anymore.";
             StrAppToDo += "\n\nReports button to show reports window with checkboxes for each item to report, ";

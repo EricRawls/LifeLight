@@ -5,10 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LifeLight"
         mc:Ignorable="d"
-        Title="LifeLight" Height="600" Width="1200">
+        Title="LifeLight" MinHeight="600" MinWidth="1200" Height="600" Width="1200">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <local:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+        <local:CountToVisibilityConverter x:Key="CountToVisibilityConverter"/>
         <Style x:Key="TextBoxBaseStyle" TargetType="TextBox">
             <Setter Property="Focusable" Value="True"/>
             <Setter Property="IsReadOnly" Value="False"/>
@@ -30,216 +31,196 @@
             </Setter>
         </Style>
     </Window.Resources>
-    <DockPanel Margin="10">
-        <StackPanel DockPanel.Dock="Right" Margin="10,0" >
+    <DockPanel x:Name="RootDockPanel" Margin="10">
+        <StackPanel x:Name="DailyDetailsPanel" DockPanel.Dock="Right" Margin="10,0" >
             <StackPanel.Resources>
                 <Style TargetType="Button">
                     <Setter Property="Margin" Value="0,0,0,5" />
                 </Style>
             </StackPanel.Resources>
-            <Calendar Name="calDate"
-                      SelectedDatesChanged="calDate_SelectedDateChanged" 
+            <Calendar Name="CalDate"
+                      SelectedDatesChanged="CalDate_SelectedDateChanged" 
                       DisplayDateStart="2025-01-01" 
                       DisplayDateEnd="{x:Static sys:DateTime.Today}" 
                       Margin="10,13,10,10"
+                      BorderBrush="Gray" BorderThickness="1"
                       xmlns:sys="clr-namespace:System;assembly=mscorlib" />
-            <TextBlock Margin="10,10,0,0">Daily Rating</TextBlock>
-            <Slider x:Name="sliderRating" Maximum="10" Minimum="0" Value="5" 
+            <TextBlock x:Name="TbkDailyRating" Margin="10,10,0,0"
+                       Text="{Binding Value, ElementName=sliderRating, StringFormat='Daily Rating: {0}'}"/>
+            <Slider x:Name="sliderRating" Maximum="10" Minimum="0"
+                    Value="{Binding Rating, UpdateSourceTrigger=PropertyChanged}" 
                     Width="180" 
                     Margin="10,0,10,10"
                     IsSnapToTickEnabled="True"/>
             <TextBlock Margin="10,10,0,0">Daily Notes</TextBlock>
             <TextBox x:Name="tbDailyNotes" Width="180" Height="100"
+                     Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}"
                      AcceptsReturn="True"
                      TextWrapping="Wrap" 
                      Style="{StaticResource TextBoxBaseStyle}"
-                     Margin="10,0,10,10"
-                     Text="{Binding DailyNotes}"/>
-            <Button Name="btnAppTODO" Margin="10,20,10,10" Width="180" Click="btnAppTODO_Click" VerticalAlignment="Bottom">App TODO</Button>
-            <Button Name="btnExport" Margin="10,0,10,10" Width="180" Click="btnExport_Click" VerticalAlignment="Bottom">Export CSV</Button>
+                     Margin="10,0,10,10"/>
+            <Button Name="btnAppTODO" Margin="10,20,10,10" Width="180" Click="BtnAppTODO_Click" VerticalAlignment="Bottom">App TODO</Button>
+            <Button Name="btnExport" Margin="10,0,10,10" Width="180" Click="BtnExport_Click" VerticalAlignment="Bottom">Export CSV</Button>
         </StackPanel>
         <StackPanel DockPanel.Dock="Left">
             <TextBlock>Daily Needs</TextBlock>
-            <ListView x:Name="lvDailyNeeds"
+            <Grid>
+                <ListView x:Name="lvDailyNeeds"
+                  MinHeight="200" MinWidth="500"
                   HorizontalContentAlignment="Stretch" SelectionMode="Extended" AlternationCount="2"
-                  Focusable="True"
-                  IsHitTestVisible="True"
+                  Focusable="True" IsHitTestVisible="True"
                   KeyboardNavigation.TabNavigation="Local"
                   KeyboardNavigation.DirectionalNavigation="Cycle">
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="ListViewItem">
-                        <Setter Property="AllowDrop" Value="True"/>
-                        <Setter Property="Focusable" Value="True"/>
-                        <Setter Property="IsHitTestVisible" Value="True"/>
-                        <Setter Property="KeyboardNavigation.TabNavigation" Value="Local"/>
-                        <Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
-                        <Style.Triggers>
-                            <Trigger Property="ItemsControl.AlternationIndex" Value="1">
-                                <Setter Property="Background" Value="#F5F5F5"/>
-                            </Trigger>
-                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                                <Setter Property="IsSelected" Value="True"/>
-                            </Trigger>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Focusable" Value="True"/>
-                            </Trigger>
-                            <DataTrigger Binding="{Binding Complete}" Value="True">
-                                <Setter Property="Background" Value="#E6FFE6"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </ListView.ItemContainerStyle>
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <Grid Margin="0,2" IsHitTestVisible="True" Focusable="True" KeyboardNavigation.IsTabStop="False">
-                            <Grid.ContextMenu>
-                                <ContextMenu x:Name="cmDailyNeeds">
-                                    <MenuItem Header="Add Item Above" Click="AddAboveDaily_Click"/>
-                                    <MenuItem Header="Add Item Below" Click="AddBelowDaily_Click"/>
-                                    <MenuItem Header="Edit Item" Click="EditDailyItem_Click"/>
-                                    <Separator/>
-                                    <MenuItem Header="Delete Item" Click="DeleteDailyItem_Click"/>
-                                    <Separator/>
-                                    <MenuItem Header="Sort List" Click="SortDailyItems_Click"/>
-                                </ContextMenu>
-                            </Grid.ContextMenu>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="240"/>
-                                <ColumnDefinition Width="100"/>
-                                <ColumnDefinition Width="60"/>
-                                <ColumnDefinition Width="120*"/>
-                            </Grid.ColumnDefinitions>
-                            <CheckBox x:Name="cbComplete" 
-                                  IsChecked="{Binding Complete, UpdateSourceTrigger=PropertyChanged}" 
-                                  VerticalAlignment="Center"
-                                  Focusable="True" 
-                                  IsHitTestVisible="True" 
-                                  IsTabStop="True"
-                                  Click="cbComplete_Click">
-                                <TextBlock Text="{Binding Title}"/>
-                            </CheckBox>
-                            <Button x:Name="btnSetNow" 
-                                Grid.Column="1" 
-                                Visibility="{Binding TimeVisibility}" 
-                                Width="60" 
-                                Click="btnSetNow_Click"
-                                Focusable="True" 
-                                IsHitTestVisible="True" 
-                                IsTabStop="True"
-                                IsEnabled="{Binding Complete, Converter={StaticResource InverseBooleanConverter}}">Set Now</Button>
-                            <TextBox x:Name="tbTime" 
-                                 Grid.Column="2" 
-                                 Style="{StaticResource TextBoxBaseStyle}"
-                                 IsEnabled="{Binding Complete, Converter={StaticResource InverseBooleanConverter}}"
-                                 Visibility="{Binding TimeVisibility}" 
-                                 Text="{Binding Time, StringFormat='hh:mm tt'}" 
-                                 GotFocus="TextBox_GotKeyboardFocus"
-                                 KeyDown="tbTime_KeyDown"
-                                 LostFocus="tbTime_LostFocus">
-                                <TextBox.InputBindings>
-                                    <KeyBinding Command="ApplicationCommands.Redo" Gesture="Ctrl+Shift+Z"/>
-                                </TextBox.InputBindings>
-                            </TextBox>
-                            <TextBox x:Name="tbComment" 
-                                 Grid.Column="3" 
-                                 IsEnabled="{Binding Complete, Converter={StaticResource InverseBooleanConverter}}"
-                                 Style="{StaticResource TextBoxBaseStyle}"
-                                 Text="{Binding Comment, UpdateSourceTrigger=PropertyChanged}" 
-                                 Margin="20,0,0,0" 
-                                 GotFocus="TextBox_GotKeyboardFocus">
-                                <TextBox.InputBindings>
-                                    <KeyBinding Command="ApplicationCommands.Redo" Gesture="Ctrl+Shift+Z"/>
-                                </TextBox.InputBindings>
-                            </TextBox>
-                        </Grid>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="AllowDrop" Value="True"/>
+                            <Setter Property="Focusable" Value="True"/>
+                            <Setter Property="IsHitTestVisible" Value="True"/>
+                            <Setter Property="KeyboardNavigation.TabNavigation" Value="Local"/>
+                            <Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
+                            <Style.Triggers>
+                                <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                                    <Setter Property="Background" Value="#F5F5F5"/>
+                                </Trigger>
+                                <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                    <Setter Property="IsSelected" Value="True"/>
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Focusable" Value="True"/>
+                                </Trigger>
+                                <DataTrigger Binding="{Binding Complete}" Value="True">
+                                    <Setter Property="Background" Value="#E6FFE6"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,2" IsHitTestVisible="True" Focusable="True" KeyboardNavigation.IsTabStop="False">
+                                <Grid.ContextMenu>
+                                    <ContextMenu x:Name="cmDailyNeeds">
+                                        <MenuItem Header="Add Item Above" Click="AddAboveDaily_Click"/>
+                                        <MenuItem Header="Add Item Below" Click="AddBelowDaily_Click"/>
+                                        <MenuItem Header="Edit Item" Click="EditDailyItem_Click"/>
+                                        <Separator/>
+                                        <MenuItem Header="Delete Item" Click="DeleteDailyItem_Click"/>
+                                        <Separator/>
+                                        <MenuItem Header="Sort List" Click="SortDailyItems_Click"/>
+                                    </ContextMenu>
+                                </Grid.ContextMenu>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="240"/>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="60"/>
+                                    <ColumnDefinition Width="120*"/>
+                                </Grid.ColumnDefinitions>
+                                <CheckBox x:Name="cbComplete" IsChecked="{Binding Complete, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Focusable="True" IsHitTestVisible="True" IsTabStop="True" Click="CbComplete_Click">
+                                    <TextBlock Text="{Binding Title}"/>
+                                </CheckBox>
+                                <Button x:Name="btnSetNow" Grid.Column="1" Visibility="{Binding TimeVisibility}" Width="60" Click="BtnSetNow_Click" Focusable="True" IsHitTestVisible="True" IsTabStop="True" IsEnabled="{Binding Complete, Converter={StaticResource InverseBooleanConverter}}">Set Now</Button>
+                                <TextBox x:Name="tbTime" Grid.Column="2" Style="{StaticResource TextBoxBaseStyle}" IsEnabled="{Binding Complete, Converter={StaticResource InverseBooleanConverter}}" Visibility="{Binding TimeVisibility}" Text="{Binding Time, StringFormat='hh:mm tt'}" GotFocus="TextBox_GotKeyboardFocus" KeyDown="TbTime_KeyDown" LostFocus="TbTime_LostFocus">
+                                    <TextBox.InputBindings>
+                                        <KeyBinding Command="ApplicationCommands.Redo" Gesture="Ctrl+Shift+Z"/>
+                                    </TextBox.InputBindings>
+                                </TextBox>
+                                <TextBox x:Name="tbComment" Grid.Column="3" IsEnabled="{Binding Complete, Converter={StaticResource InverseBooleanConverter}}" Style="{StaticResource TextBoxBaseStyle}" Text="{Binding Comment, UpdateSourceTrigger=PropertyChanged}" Margin="20,0,0,0" GotFocus="TextBox_GotKeyboardFocus">
+                                    <TextBox.InputBindings>
+                                        <KeyBinding Command="ApplicationCommands.Redo" Gesture="Ctrl+Shift+Z"/>
+                                    </TextBox.InputBindings>
+                                </TextBox>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <Border Background="#F0F0F0" Opacity="0.8" 
+                        Visibility="{Binding Items.Count, ElementName=lvDailyNeeds, Converter={StaticResource CountToVisibilityConverter}}">
+                    <TextBlock Text="Right-click to add a daily task" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="14" Foreground="Gray">
+                        <TextBlock.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Add Daily Task" Click="AddAboveDaily_Click"/>
+                            </ContextMenu>
+                        </TextBlock.ContextMenu>
+                    </TextBlock>
+                </Border>
+            </Grid>
+
             <TextBlock Margin="0,10,0,0">Variable Items</TextBlock>
-            <ListView x:Name="lvVariableNeeds"
+            <Grid>
+                <ListView x:Name="lvVariableNeeds"
+                  MinHeight="200" MinWidth="500"
                   HorizontalContentAlignment="Stretch" SelectionMode="Extended" AlternationCount="2"
-                  Focusable="True"
-                  IsHitTestVisible="True"
+                  Focusable="True" IsHitTestVisible="True"
                   KeyboardNavigation.TabNavigation="Local"
                   KeyboardNavigation.DirectionalNavigation="Cycle">
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="ListViewItem">
-                        <Setter Property="AllowDrop" Value="True"/>
-                        <Setter Property="Focusable" Value="True"/>
-                        <Setter Property="IsHitTestVisible" Value="True"/>
-                        <Setter Property="KeyboardNavigation.TabNavigation" Value="Local"/>
-                        <Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
-                        <Style.Triggers>
-                            <Trigger Property="ItemsControl.AlternationIndex" Value="1">
-                                <Setter Property="Background" Value="#F5F5F5"/>
-                            </Trigger>
-                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                                <Setter Property="IsSelected" Value="True"/>
-                            </Trigger>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Focusable" Value="True"/>
-                            </Trigger>
-                            <DataTrigger Binding="{Binding Complete}" Value="True">
-                                <Setter Property="Background" Value="#E6FFE6"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </ListView.ItemContainerStyle>
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <Grid Margin="0,2" IsHitTestVisible="True" Focusable="True" KeyboardNavigation.IsTabStop="False">
-                            <Grid.ContextMenu>
-                                <ContextMenu x:Name="cmVariableNeeds">
-                                    <MenuItem Header="Add Item Above" Click="AddAboveVariable_Click"/>
-                                    <MenuItem Header="Add Item Below" Click="AddBelowVariable_Click"/>
-                                    <MenuItem Header="Edit Item" Click="EditVariableItem_Click"/>
-                                    <Separator/>
-                                    <MenuItem Header="Delete Item" Click="DeleteVariableItem_Click"/>
-                                    <Separator/>
-                                    <MenuItem Header="Sort List" Click="SortVariableItems_Click"/>
-                                </ContextMenu>
-                            </Grid.ContextMenu>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="240"/>
-                                <ColumnDefinition Width="100"/>
-                                <ColumnDefinition Width="260"/>
-                                <ColumnDefinition Width="120*"/>
-                            </Grid.ColumnDefinitions>
-                            <CheckBox x:Name="cbComplete" 
-                                  IsChecked="{Binding Complete, UpdateSourceTrigger=PropertyChanged}" 
-                                  VerticalAlignment="Center"
-                                  Focusable="True" 
-                                  IsHitTestVisible="True" 
-                                  IsTabStop="True"
-                                  Click="cbComplete_Click">
-                                <TextBlock Text="{Binding Title}"/>
-                            </CheckBox>
-                            <TextBlock Grid.Column="1"
-                                 Visibility="{Binding DueDateVisibility}"
-                                 FontWeight="Bold" 
-                                 IsEnabled="{Binding Complete, Converter={StaticResource InverseBooleanConverter}}"
-                                 >Due Wed Jan 28
-                            </TextBlock>
-                            <TextBlock x:Name="tbkPreviousCompletions" 
-                                 Grid.Column="2"  
-                                 IsEnabled="{Binding Complete, Converter={StaticResource InverseBooleanConverter}}"
-                                 >Previous: Mon Jan 29, Sat Jan 27, Thu Jan 25
-                            </TextBlock>
-                            <TextBox x:Name="tbComment" 
-                                 Grid.Column="3" 
-                                 Style="{StaticResource TextBoxBaseStyle}"
-                                 Text="{Binding Comment, UpdateSourceTrigger=PropertyChanged}" 
-                                 Margin="20,0,0,0" 
-                                 IsEnabled="{Binding Complete, Converter={StaticResource InverseBooleanConverter}}"
-                                 GotFocus="TextBox_GotKeyboardFocus">
-                                <TextBox.InputBindings>
-                                    <KeyBinding Command="ApplicationCommands.Redo" Gesture="Ctrl+Shift+Z"/>
-                                </TextBox.InputBindings>
-                            </TextBox>
-                        </Grid>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="AllowDrop" Value="True"/>
+                            <Setter Property="Focusable" Value="True"/>
+                            <Setter Property="IsHitTestVisible" Value="True"/>
+                            <Setter Property="KeyboardNavigation.TabNavigation" Value="Local"/>
+                            <Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
+                            <Style.Triggers>
+                                <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                                    <Setter Property="Background" Value="#F5F5F5"/>
+                                </Trigger>
+                                <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                    <Setter Property="IsSelected" Value="True"/>
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Focusable" Value="True"/>
+                                </Trigger>
+                                <DataTrigger Binding="{Binding Complete}" Value="True">
+                                    <Setter Property="Background" Value="#E6FFE6"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,2" IsHitTestVisible="True" Focusable="True" KeyboardNavigation.IsTabStop="False">
+                                <Grid.ContextMenu>
+                                    <ContextMenu x:Name="cmVariableNeeds">
+                                        <MenuItem Header="Add Item Above" Click="AddAboveVariable_Click"/>
+                                        <MenuItem Header="Add Item Below" Click="AddBelowVariable_Click"/>
+                                        <MenuItem Header="Edit Item" Click="EditVariableItem_Click"/>
+                                        <Separator/>
+                                        <MenuItem Header="Delete Item" Click="DeleteVariableItem_Click"/>
+                                        <Separator/>
+                                        <MenuItem Header="Sort List" Click="SortVariableItems_Click"/>
+                                    </ContextMenu>
+                                </Grid.ContextMenu>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="240"/>
+                                    <ColumnDefinition Width="160"/>
+                                    <ColumnDefinition Width="260"/>
+                                    <ColumnDefinition Width="120*"/>
+                                </Grid.ColumnDefinitions>
+                                <CheckBox x:Name="cbComplete" IsChecked="{Binding Complete, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Focusable="True" IsHitTestVisible="True" IsTabStop="True" Click="CbComplete_Click">
+                                    <TextBlock Text="{Binding Title}"/>
+                                </CheckBox>
+                                <TextBlock Grid.Column="1" Visibility="{Binding DueDateVisibility}" FontWeight="Bold" Margin="20,0,0,0" Background="Aqua" IsEnabled="{Binding Complete, Converter={StaticResource InverseBooleanConverter}}">Due Wed Jan 28</TextBlock>
+                                <TextBlock x:Name="tbkPreviousCompletions" Grid.Column="2" Margin="20,0,0,0" IsEnabled="{Binding Complete, Converter={StaticResource InverseBooleanConverter}}">Previous: Mon Jan 29, Sat Jan 27, Thu Jan 25</TextBlock>
+                                <TextBox x:Name="tbComment" Grid.Column="3" Style="{StaticResource TextBoxBaseStyle}" Text="{Binding Comment, UpdateSourceTrigger=PropertyChanged}" Margin="20,0,0,0" IsEnabled="{Binding Complete, Converter={StaticResource InverseBooleanConverter}}" GotFocus="TextBox_GotKeyboardFocus">
+                                    <TextBox.InputBindings>
+                                        <KeyBinding Command="ApplicationCommands.Redo" Gesture="Ctrl+Shift+Z"/>
+                                    </TextBox.InputBindings>
+                                </TextBox>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <!-- Empty State Overlay -->
+                <Border Background="#F0F0F0" Opacity="0.8" 
+                        Visibility="{Binding Items.Count, ElementName=lvVariableNeeds, Converter={StaticResource CountToVisibilityConverter}}">
+                    <TextBlock Text="Right-click to add a variable task" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="14" Foreground="Gray">
+                        <TextBlock.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Add Variable Task" Click="AddAboveVariable_Click"/>
+                            </ContextMenu>
+                        </TextBlock.ContextMenu>
+                    </TextBlock>
+                </Border>
+            </Grid>
         </StackPanel>
     </DockPanel>
 </Window>
