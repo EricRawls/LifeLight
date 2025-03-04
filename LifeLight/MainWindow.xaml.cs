@@ -74,6 +74,7 @@ namespace LifeLight
 
             SelectedDay = DateTime.Today;
             AddDayToLog(SelectedDay);
+            CalDate.SelectedDate = SelectedDay;
             PopulateDummyData();
             // Update LastCompletedDate for each VariableTodoItem
             foreach (var vn in Log[SelectedDay].VariableNeeds)
@@ -464,7 +465,7 @@ namespace LifeLight
                         {
                             textBlock.Text = $"Due {vti.DueDate.Value:ddd MMM dd}";
                             textBlock.Foreground = difference.Days < 0 ? Brushes.Red : Brushes.Black;
-                            textBlock.FontWeight = FontWeights.Normal;
+                            textBlock.FontWeight = difference.Days < 0 ? FontWeights.Bold : FontWeights.Normal;
                         }
                     }
                 }
@@ -544,7 +545,27 @@ namespace LifeLight
         private int _daysFrequency = 0;
         private string _comment = "";
         private Visibility _dueDateVisibility = Visibility.Hidden;
-        private DateTime? _lastCompletedDate;
+        //todo: replace ai code. change DueDate to a regular get, set property.
+        //If lastCompletedDate == null then duedate = selectedDay
+        //else, duedate = lastCompletedDate + frequency
+        //Move UI updating out of calendar handler and place a call to it there
+        //Call the UI update when item is checked.
+        //Only update the checked item in that case (maybe with a unique UI updating method)
+        //checking a past item will have to update the lastCompletedDate for all future items until a new completed date is found
+        //THIS ^ ^ ^ IS WHY I LIKE MY ORIGINAL IDEA BETTER
+        //NO KEEPING THESE ADDITIONAL VARIABLES TO JUGGLE AND UPDATE. THAT WAS AN    A R T I F I C I A L    "INTELLIGENCE" IDEA.
+        //JUST DO THE WORK EVERY TIME THE DAY CHANGES AND STOP KEEPING EXTRA VARIABLES TO MANAGE
+        //ALL YOU HAVE TO DO IS LOOK BACK IN TIME FOR THE SAME ENTRY
+        //IF IT DOES NOT EXIST ON A DAY, THEN EXIT FOR.
+        //IF YOU FIND A COMPLETION, EXIT FOR.
+        //IF YOU DON'T FIND IT, THEN IT IS DUE TODAY.
+        //IF THERE IS NO DAYSFREQUENCY, THEN YOU DON'T EVEN HAVE TO LOOK.
+        //IF THE BOX IS TICKED, THEN IT DOES NOT NEED TO JUGGLE SHIT IN THE FUTURE. IT IS JUST COMPLETE.
+        //  IT WILL ONLY NEED TO UPDATE THE UI FOR THIS ITEM AND NOTHING ELSE IS CHANGED.
+        //  MY IDEA WAS BETTER FROM THE START. I FELL VICTIM TO MY OWN IGNORANT LAZINESS IN LETTING THE AI GIVE ME CODE.
+        //  DON'T DISCOUNT MY OWN INTUITION, ESPECIALLY - ESPECIALLY FOR DATA STRUCTURE LIKE THIS.
+        //  IT'S OKAY TO ASK FOR INPUT BUT ...
+        //REMEMBER: IF IT FEELS TOO COMPLICATED, THAT MEANS IT IS.
 
         public required string Title
         {
@@ -577,22 +598,8 @@ namespace LifeLight
             set { _dueDateVisibility = value; OnPropertyChanged(); }
         }
 
-        public DateTime? LastCompletedDate
-        {
-            get => _lastCompletedDate;
-            set
-            {
-                _lastCompletedDate = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(DueDate)); // Trigger DueDate recalculation
-            }
-        }
 
-        public DateTime? DueDate => DaysFrequency > 0 && LastCompletedDate.HasValue
-            ? LastCompletedDate.Value.AddDays(DaysFrequency)
-            : null;
-
-        // Method to find and set last completion date from the log
+        // todo: alter this Method to find and set last completion date from the log
         public void UpdateLastCompletedDate(Dictionary<DateTime, DateLog> log)
         {
             if (DaysFrequency <= 0) return;
@@ -609,13 +616,14 @@ namespace LifeLight
 
                     if (completedItem != null)
                     {
-                        LastCompletedDate = checkDate;
+                        //todo remember this is just a bs placeholder
+                        var pootLastCompletedDate = checkDate;
                         return;
                     }
                 }
                 checkDate = checkDate.AddDays(-1);
             }
-            LastCompletedDate = null; // No completion found
+            DateTime tootLastCompletedDate ; // No completion found
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
